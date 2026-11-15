@@ -591,9 +591,16 @@ class AppLauncherMode(private val context: Context) : StripSearch {
     /**
      * For the list of the home screen: what else can be done with a starred contact, each shown as an icon at the right
      * of it: call the default number, the WhatsApp chat when a tap opens Element, driving to the default address, when
-     * the contact has them, and the contact in the contacts app.
+     * the contact has them, and the contact in the contacts app. For a skiff session of Termarchy with Claude, which a
+     * tap opens in the Claude app, the session in Termarchy.
      */
     fun personActions(app: App): List<App> {
+        if (app.shortcut?.agent?.claudeUrl != null) {
+            val termarchy = appOf(app) ?: return emptyList()
+            return listOf(App("termarchy|${app.key}", "termarchy://${app.kissId}",
+                context.getString(R.string.launcher_open_in_termarchy, app.label), app.component, app.user, termarchy.icon,
+                null, emptyList(), run = { startShortcut(app); recordUse(app) }))
+        }
         if (app.whatsAppDataId == null) return emptyList()
         val (numbers, addresses, contactIds) = contactDetails
             ?: Triple(starredData(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE, ContactsContract.CommonDataKinds.Phone.NUMBER),
@@ -669,12 +676,12 @@ class AppLauncherMode(private val context: Context) : StripSearch {
 
     /**
      * For a shortcut: the name of its app (as named in the list), to tell which app it belongs to, and its detail. An
-     * Termarchy pane has Termarchy's icon instead, and its detail only when its agent waits for input or finished unseen: a
-     * working one pulses, an idle one says nothing.
+     * Termarchy pane has Termarchy's icon instead, and its detail only when its agent waits for input: a working one
+     * pulses, a finished or idle one says nothing.
      */
     fun appNameOf(app: App): String? {
         val shortcut = app.shortcut ?: return null
-        if (shortcut.packageName == TermarchyForwards.TERMARCHY_PACKAGE) return shortcut.agent?.status?.takeIf { it == "blocked" || it == "done" }
+        if (shortcut.packageName == TermarchyForwards.TERMARCHY_PACKAGE) return shortcut.agent?.status?.takeIf { it == "blocked" }
         return listOfNotNull(appOf(app)?.label, shortcut.detail).joinToString(" · ").ifEmpty { null }
     }
 
@@ -706,18 +713,27 @@ class AppLauncherMode(private val context: Context) : StripSearch {
     /**
      * Shows the icon of a result in [view]: for a person typing in MatriX, its icon with the crown moving; for a
      * Termarchy pane whose agent is working (not one waiting for input), the ghost of Termarchy blinking in [color]
-     * instead, as Termarchy shows it.
+     * instead, as Termarchy shows it, or the spinner of Claude Code for a skiff session with Claude (opened in Claude);
+     * such a session that finished unseen has the icon of the Claude app.
      */
     fun showIcon(view: ImageView, app: App, color: Int) {
         if (app.element != null && roomOf(app) in typingRooms) {
             if (view.drawable !is TypingBubbleDrawable) view.setImageDrawable(TypingBubbleDrawable(color).also { it.start() })
             return
         }
+        if (app.shortcut?.agent?.let { it.claudeUrl != null && it.status == "done" } == true) {
+            val claude = apps.firstOrNull { it.component.packageName == CLAUDE_PACKAGE && it.shortcut == null && it.user == Process.myUserHandle() }
+            return view.setImageDrawable(claude?.icon ?: iconOf(app))
+        }
         val shortcut = app.shortcut?.takeIf { it.agent?.status == "working" }
             ?: return view.setImageDrawable(iconOf(app))
         // in step with when the agent started working, as Termarchy gives it (else from when the list first showed it)
         val startedAt = shortcut.since.takeIf { it > 0 }
             ?: spinnerStarts.getOrPut(app.key) { System.currentTimeMillis() }
+        if (shortcut.agent?.claudeUrl != null) {
+            if ((view.drawable as? ClaudeSpinnerDrawable)?.startedAt == startedAt) return
+            return view.setImageDrawable(ClaudeSpinnerDrawable(color, startedAt).also { it.start() })
+        }
         if ((view.drawable as? WorkingGhostDrawable)?.startedAt == startedAt) return
         view.setImageDrawable(WorkingGhostDrawable(color, startedAt).also { it.start() })
     }
@@ -865,6 +881,12 @@ class AppLauncherMode(private val context: Context) : StripSearch {
             stop()
             return
         }
+        // a skiff session with Claude: its conversation in the Claude app (in Termarchy by the icon at its right)
+        app.shortcut?.agent?.claudeUrl?.let { url ->
+            recordUse(app)
+            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)).setPackage(CLAUDE_PACKAGE))
+            return
+        }
         // a person with a message: the chat where it came (WhatsApp or Element), with the message box tapped; a session of
         // Termarchy that finished or asks: the notice, which opens the session
         app.unread?.let {
@@ -885,8 +907,7 @@ class AppLauncherMode(private val context: Context) : StripSearch {
                 context.startActivity(Intent(Intent.ACTION_VIEW)
                     .setDataAndType(ContentUris.withAppendedId(ContactsContract.Data.CONTENT_URI, app.whatsAppDataId), WHATSAPP_MIME_TYPE)
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
-            else if (app.shortcut != null)
-                context.getSystemService(LauncherApps::class.java).startShortcut(app.shortcut.packageName, app.shortcut.id, null, null, app.user)
+            else if (app.shortcut != null) startShortcut(app)
             else if (context.getSystemService(UserManager::class.java).isQuietModeEnabled(app.user)) launchWhenUnlocked(app)
             else context.getSystemService(LauncherApps::class.java).startMainActivity(app.component, app.user, null, null)
             recordUse(app)
@@ -894,6 +915,11 @@ class AppLauncherMode(private val context: Context) : StripSearch {
             Log.w(TAG, "can't launch ${app.key}", e)
         }
         stop()
+    }
+
+    private fun startShortcut(app: App) {
+        val shortcut = app.shortcut ?: return
+        context.getSystemService(LauncherApps::class.java).startShortcut(shortcut.packageName, shortcut.id, null, null, app.user)
     }
 
     /**
@@ -1561,6 +1587,8 @@ class AppLauncherMode(private val context: Context) : StripSearch {
         private const val ICON_VERSION = 2
         private const val TAGS_FILE = "etiquetas-kiss.json"
         private const val WHATSAPP_MIME_TYPE = "vnd.android.cursor.item/vnd.com.whatsapp.profile"
+        /** the Claude app, where a claude.ai link of a Claude Code conversation opens it */
+        private const val CLAUDE_PACKAGE = "com.anthropic.claude"
         /** the Matrix ids of the contacts, by KISS id, for the saved list */
         private const val CONTACT_MATRIX_FILE = "matrix-contactos.json"
         /** a field of a Google contact with a label of one's own: the value in data1, the label in data2 */
@@ -1804,15 +1832,18 @@ class AppLauncherMode(private val context: Context) : StripSearch {
                     val kissId = "shortcut://${info.`package`}/${info.id}" + if (user == Process.myUserHandle()) "" else "/$serial"
                     if (!isShortcutShown(info.isPinned, info.`package`, kissId, enabledApps, removed)) return@mapNotNull null
                     val iconKey = "shortcut|${info.`package`}|${info.id}|$serial|${info.lastChangedTimestamp}"
-                    val (icon, iconFile) = cachedIcon(context, iconKey, usedIconFiles) {
+                    // a chat of WhatsApp shows the icon of WhatsApp, as a starred person: its photo makes no icon
+                    val (icon, iconFile) = if (info.`package` == "com.whatsapp") app.icon to app.iconFile
+                    else cachedIcon(context, iconKey, usedIconFiles) {
                         launcherApps.getShortcutIconDrawable(info, context.resources.displayMetrics.densityDpi)
                             ?.let { processedIcon(context, it, user, info.id) } ?: app.icon
                     }
                     val detail = info.longLabel?.toString()?.takeIf { it.isNotBlank() && it != label }
                     val key = "shortcut|${info.`package`}|${info.id}|$serial"
-                    // a chat kept from its notification is as recent as that notification (WhatsApp doesn't publish it again)
+                    // a chat of WhatsApp moves only when opened or when a message comes ([bump]), not when WhatsApp
+                    // publishes it again
                     val isCached = !info.isDynamic && !info.isDeclaredInManifest && !info.isPinned
-                    val changedAt = if (isCached) info.lastChangedTimestamp
+                    val changedAt = if (info.`package` == "com.whatsapp") 0L
                         else shortcutChangedAt(previous[key], label to detail, info.`package` in previousApps, now)
                     App(key, kissId, label, app.component, user, icon,
                         names[kissId], tags[kissId].orEmpty(), shortcut = Shortcut(info.`package`, info.id, info.isPinned,

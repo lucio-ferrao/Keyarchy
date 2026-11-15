@@ -560,6 +560,7 @@
     <string name="launcher_uninstall">Desinstalar</string>
     <string name="launcher_remove_shortcut">Remover</string>
     <string name="launcher_open_contact">Contacto de %1$s</string>
+    <string name="launcher_open_in_termarchy">%1$s no Termarchy</string>
     <string name="app_shortcuts">Atalhos das apps</string>
     <string name="calendars">Calendários</string>
     <string name="mousarchy">Mousarchy</string>

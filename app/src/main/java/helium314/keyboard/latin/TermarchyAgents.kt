@@ -5,8 +5,11 @@ import android.content.Context
 import android.net.Uri
 import helium314.keyboard.latin.utils.Log
 
-/** The agent of a Termarchy pane, as Termarchy tells it: Herdr's status, whether it is active, and since when. */
-data class AgentState(val status: String, val active: Boolean, val since: Long)
+/**
+ * The agent of a Termarchy pane, as Termarchy tells it: Herdr's status, whether it is active, since when and, for a
+ * skiff session, the claude.ai link of its Claude conversation.
+ */
+data class AgentState(val status: String, val active: Boolean, val since: Long, val claudeUrl: String? = null)
 
 /**
  * The agents of the Termarchy panes with a shortcut, by the id of the shortcut, as Termarchy tells them live in a
@@ -20,7 +23,10 @@ object TermarchyAgents {
     /** the agents by shortcut id; empty without Termarchy or while it is not connected */
     fun read(context: Context): Map<String, AgentState> = try {
         context.contentResolver.query(URI, null, null, null, null)?.use { c ->
-            buildMap { while (c.moveToNext()) put(c.getString(0), AgentState(c.getString(1), c.getInt(2) == 1, c.getLong(3))) }
+            buildMap {
+                while (c.moveToNext()) put(c.getString(0), AgentState(c.getString(1), c.getInt(2) == 1, c.getLong(3),
+                    if (c.columnCount > 4) c.getString(4) else null))
+            }
         }.orEmpty()
     } catch (e: Exception) {
         Log.w("TermarchyAgents", "can't read the agents of Termarchy", e)
