@@ -201,11 +201,21 @@ class AppLauncherMode(private val context: Context) : StripSearch {
 
     fun toggle() = if (isActive) stop() else start()
 
+    /** Ctrl+Space of a physical keyboard: opens the mode, or leaves it as Esc does */
+    fun toggleFromPhysicalKeyboard() = if (isActive) leave() else start()
+
+    /** Esc of a physical keyboard: on the home screen back to the last app (as the hide key), elsewhere out of the mode */
+    private fun leave() {
+        if (!isOnHome) stop()
+        else if (!returnToLastApp()) clearSearch()
+    }
+
     fun start() {
         isActive = true
         startTime = SystemClock.uptimeMillis()
         // a tap on a button or element of the app (seen by the accessibility service) leaves the mode
         ScreenAgentService.onTapInOtherApp = { onTapOutside() }
+        ScreenAgentService.onEscape = { leave() }
         // notifications that arrive or go away while the list is open show up in it right away
         LauncherNotificationService.onChange = { lastUsed = readTimes(context, PREF_LAST_USED); show() }
         // start also runs while the mode is open (the keyboard restarting on the home screen): follow things only once
@@ -255,6 +265,7 @@ class AppLauncherMode(private val context: Context) : StripSearch {
         isActive = false
         HomeActivity.showResults(this, emptyList())
         ScreenAgentService.onTapInOtherApp = null
+        ScreenAgentService.onEscape = null
         LauncherNotificationService.onChange = null
         context.getSystemService(MediaSessionManager::class.java).removeOnActiveSessionsChangedListener(playersChanged)
         follow(emptyList())

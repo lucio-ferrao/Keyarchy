@@ -825,6 +825,12 @@ public class LatinIME extends InputMethodService implements
 
     void onStartInputViewInternal(final EditorInfo editorInfo, final boolean restarting) {
         super.onStartInputView(editorInfo, restarting);
+        // Ctrl+Space of a physical keyboard (taken by the accessibility service) opens the launcher mode here
+        ScreenAgentService.Companion.setOnCtrlSpace(() -> {
+            mInputLogic.commitTyped(mSettings.getCurrent(), LastComposedWord.NOT_A_SEPARATOR);
+            mAppLauncher.toggleFromPhysicalKeyboard();
+            return true;
+        });
 
         setGestureDataGatheringMode(editorInfo, restarting);
 
@@ -1015,6 +1021,7 @@ public class LatinIME extends InputMethodService implements
 
     void onFinishInputViewInternal(final boolean finishingInput) {
         super.onFinishInputView(finishingInput);
+        ScreenAgentService.Companion.setOnCtrlSpace(null);
         Log.i(TAG, "onFinishInputView");
         cleanupInternalStateForFinishInput();
     }
@@ -1837,6 +1844,20 @@ public class LatinIME extends InputMethodService implements
 
     public void toggleAppLauncher() {
         mAppLauncher.toggle();
+    }
+
+    /**
+     * A key of a physical keyboard, while the launcher or emoji mode takes the typing: it goes to the search, as the keys
+     * of the keyboard on the screen do, instead of the text field; true if it did.
+     */
+    public boolean onPhysicalKeyInSearch(@NonNull final Event event) {
+        final StripSearch search = capturingSearch();
+        if (search == null) return false;
+        // Ctrl with a key means nothing to the search
+        if ((event.getMetaState() & KeyEvent.META_CTRL_ON) != 0) return true;
+        if (!search.onEvent(event)) return false;
+        mKeyboardSwitcher.onEvent(event, Constants.TextUtils.CAP_MODE_OFF, null);
+        return true;
     }
 
     // slightly modified from Simple Keyboard: https://github.com/rkkr/simple-keyboard/blob/master/app/src/main/java/rkr/simplekeyboard/inputmethod/latin/LatinIME.java

@@ -7,6 +7,7 @@ import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.content.Intent
+import android.view.KeyEvent
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityNodeInfo
 import android.view.accessibility.AccessibilityWindowInfo
@@ -113,6 +114,31 @@ class ScreenAgentService : AccessibilityService() {
             .map { it.activityInfo.packageName }.toSet()
     }
 
+    /** the key whose press was taken here (Ctrl+Space or Esc), to take its release too */
+    private var takenKey = KeyEvent.KEYCODE_UNKNOWN
+
+    /**
+     * Ctrl+Space of a physical keyboard, from any app (Android would switch the keyboard language with it): opens the
+     * launcher mode in the keyboard over a text field, else on the home screen; Esc leaves the mode.
+     */
+    override fun onKeyEvent(event: KeyEvent): Boolean {
+        if (event.action == KeyEvent.ACTION_UP && event.keyCode == takenKey) {
+            takenKey = KeyEvent.KEYCODE_UNKNOWN
+            return true
+        }
+        if (event.action != KeyEvent.ACTION_DOWN) return false
+        val isCtrlSpace = event.keyCode == KeyEvent.KEYCODE_SPACE && event.isCtrlPressed && !event.isAltPressed &&
+            !event.isMetaPressed && !event.isShiftPressed
+        val escape = onEscape.takeIf { event.keyCode == KeyEvent.KEYCODE_ESCAPE }
+        if (!isCtrlSpace && escape == null) return false
+        takenKey = event.keyCode
+        if (event.repeatCount > 0) return true
+        if (escape != null) escape()
+        else if (onCtrlSpace?.invoke() != true)
+            startActivity(Intent(this, HomeActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+        return true
+    }
+
     override fun onInterrupt() {}
 
     companion object {
@@ -172,6 +198,12 @@ class ScreenAgentService : AccessibilityService() {
 
         /** called on a click in another app, set while the launcher mode is open (to leave it) */
         var onTapInOtherApp: (() -> Unit)? = null
+
+        /** Ctrl+Space of a physical keyboard, set while the keyboard is shown on a text field; true if it took it */
+        var onCtrlSpace: (() -> Boolean)? = null
+
+        /** Esc of a physical keyboard, set while the launcher mode is open (to leave it) */
+        var onEscape: (() -> Unit)? = null
 
         /** the running service, or null if it is not enabled in the accessibility settings */
         var instance: ScreenAgentService? = null
