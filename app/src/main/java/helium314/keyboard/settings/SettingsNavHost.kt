@@ -19,6 +19,7 @@ import helium314.keyboard.latin.settings.getTransitionAnimationScale
 import helium314.keyboard.settings.screens.AboutScreen
 import helium314.keyboard.settings.screens.AdvancedSettingsScreen
 import helium314.keyboard.settings.screens.AppShortcutsScreen
+import helium314.keyboard.settings.screens.SilentNotificationsScreen
 import helium314.keyboard.settings.screens.CalendarsScreen
 import helium314.keyboard.settings.screens.MousarchyScreen
 import helium314.keyboard.settings.screens.AppearanceScreen
@@ -82,6 +83,7 @@ fun SettingsNavHost(
                 onClickLayouts = { navController.navigate(SettingsDestination.Layouts) },
                 onClickDictionaries = { navController.navigate(SettingsDestination.Dictionaries) },
                 onClickAppShortcuts = { navController.navigate(SettingsDestination.AppShortcuts) },
+                onClickSilentNotifications = { navController.navigate(SettingsDestination.SilentNotifications) },
                 onClickCalendars = { navController.navigate(SettingsDestination.Calendars) },
                 onClickMousarchy = { navController.navigate(SettingsDestination.Mousarchy) },
                 onClickBack = ::goBack,
@@ -110,6 +112,9 @@ fun SettingsNavHost(
         }
         composable(SettingsDestination.AppShortcuts) {
             AppShortcutsScreen(onClickBack = ::goBack)
+        }
+        composable(SettingsDestination.SilentNotifications) {
+            SilentNotificationsScreen(onClickBack = ::goBack)
         }
         composable(SettingsDestination.Calendars) {
             CalendarsScreen(onClickBack = ::goBack)
@@ -180,6 +185,7 @@ object SettingsDestination {
     const val Layouts = "layouts"
     const val Dictionaries = "dictionaries"
     const val AppShortcuts = "app_shortcuts"
+    const val SilentNotifications = "silent_notifications"
     const val Calendars = "calendars"
     const val Mousarchy = "mousarchy"
     val navTarget = MutableStateFlow(Settings)

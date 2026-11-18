@@ -388,6 +388,7 @@
     <string name="launcher_open_contact">Contact of %1$s</string>
     <string name="launcher_open_in_termarchy">%1$s in Termarchy</string>
     <string name="app_shortcuts">App shortcuts</string>
+    <string name="silent_notifications">Silent notifications</string>
     <string name="calendars">Calendars</string>
     <string name="mousarchy">Mousarchy</string>
     <string name="mousarchy_missing">This build has no Mousarchy.</string>

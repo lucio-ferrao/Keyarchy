@@ -4,12 +4,16 @@ package helium314.keyboard.latin
 import android.app.ActivityOptions
 import android.app.Notification
 import android.app.NotificationManager
+import android.app.PendingIntent
+import android.content.Context
 import android.os.Build
 import android.service.notification.NotificationListenerService
 import android.service.notification.NotificationListenerService.Ranking
 import android.service.notification.NotificationListenerService.RankingMap
 import android.service.notification.StatusBarNotification
+import androidx.core.content.edit
 import helium314.keyboard.latin.utils.Log
+import helium314.keyboard.latin.utils.prefs
 
 /**
  * Gives the launcher mode the notifications in the status bar, to find them by their text and jump to where they
@@ -29,21 +33,31 @@ class LauncherNotificationService : NotificationListenerService() {
         /** the shortcut it belongs to, as its app tells it (a session of Termarchy) */
         val shortcutId: String? get() = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) notification.shortcutId else null
 
+        /** its buttons, without those that ask for a text (a reply) */
+        val actions: List<Notification.Action> get() =
+            notification.actions.orEmpty().filter { it.actionIntent != null && it.remoteInputs.isNullOrEmpty() }
+
         /** opens what the notification points to, like a tap on it; removes it if it is meant to go away when opened */
         fun open(): Boolean {
             val intent = notification.contentIntent ?: return false
-            return try {
-                val options = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
-                    ActivityOptions.makeBasic().setPendingIntentBackgroundActivityStartMode(
-                        ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED).toBundle()
-                else null
-                intent.send(null, 0, null, null, null, null, options)
-                if (notification.flags and Notification.FLAG_AUTO_CANCEL != 0) instance?.cancelNotification(key)
-                true
-            } catch (e: Exception) {
-                Log.w(TAG, "can't open the notification $key", e)
-                false
-            }
+            if (!send(intent)) return false
+            if (notification.flags and Notification.FLAG_AUTO_CANCEL != 0) instance?.cancelNotification(key)
+            return true
+        }
+
+        /** a tap on one of its [actions] */
+        fun run(action: Notification.Action): Boolean = send(action.actionIntent)
+
+        private fun send(intent: PendingIntent): Boolean = try {
+            val options = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
+                ActivityOptions.makeBasic().setPendingIntentBackgroundActivityStartMode(
+                    ActivityOptions.MODE_BACKGROUND_ACTIVITY_START_ALLOWED).toBundle()
+            else null
+            intent.send(null, 0, null, null, null, null, options)
+            true
+        } catch (e: Exception) {
+            Log.w(TAG, "can't open the notification $key", e)
+            false
         }
     }
 
@@ -60,7 +74,10 @@ class LauncherNotificationService : NotificationListenerService() {
         val entries = entries()
         AppLauncherMode.bump(this, entries)
         onChange?.invoke()
-        entries.firstOrNull { it.key == sbn?.key }?.let { entry -> onPosted?.invoke(entry) }
+        // not in the strip the silent and ongoing ones, shown in the list for some apps
+        val ranking = try { currentRanking } catch (e: Exception) { null }
+        entries.firstOrNull { it.key == sbn?.key }?.takeIf { sbn != null && isLoud(sbn, ranking) }
+            ?.let { entry -> onPosted?.invoke(entry) }
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {
@@ -87,15 +104,38 @@ class LauncherNotificationService : NotificationListenerService() {
             }
         }
 
+        /** the apps whose silent and ongoing notifications are in the list, set in the settings ("Silent notifications") */
+        private const val PREF_SILENT_APPS = "app_search_silent_notification_apps"
+        /** whether Home Assistant was turned on in [PREF_SILENT_APPS], once: so turning it off afterwards stays */
+        private const val PREF_SILENT_APPS_DEFAULTS = "app_search_silent_notification_apps_defaults"
+        private const val HOME_ASSISTANT_PACKAGE = "io.homeassistant.companion.android"
+
+        /** the apps turned on in "Silent notifications"; Home Assistant is on from the start, for the buttons of the gate */
+        fun silentApps(context: Context): Set<String> {
+            val prefs = context.prefs()
+            if (!prefs.getBoolean(PREF_SILENT_APPS_DEFAULTS, false)) prefs.edit {
+                putStringSet(PREF_SILENT_APPS, prefs.getStringSet(PREF_SILENT_APPS, emptySet())!! + HOME_ASSISTANT_PACKAGE)
+                putBoolean(PREF_SILENT_APPS_DEFAULTS, true)
+            }
+            return prefs.getStringSet(PREF_SILENT_APPS, emptySet())!!
+        }
+
+        fun setSilentShown(context: Context, packageName: String, shown: Boolean) {
+            val enabled = silentApps(context)
+            context.prefs().edit { putStringSet(PREF_SILENT_APPS, if (shown) enabled + packageName else enabled - packageName) }
+        }
+
         /**
-         * The notifications in the status bar, newest first, without ongoing ones, group summaries and silent ones (those
-         * under "Silent" in the shade); empty if not allowed.
+         * The notifications in the status bar, newest first, without group summaries and those of foreground services;
+         * the ongoing and silent ones (those under "Silent" in the shade) only of the apps turned on in "Silent
+         * notifications". Empty if not allowed.
          */
         fun entries(): List<Entry> {
             val service = instance ?: return emptyList()
             val notifications = try { service.activeNotifications } catch (e: Exception) { null } ?: return emptyList()
             val ranking = try { service.currentRanking } catch (e: Exception) { null }
-            return notifications.filter { isShown(it) && !isSilent(it, ranking) }.map { sbn ->
+            val silentApps = silentApps(service)
+            return notifications.filter { isShown(it) && (it.packageName in silentApps || isLoud(it, ranking)) }.map { sbn ->
                 val extras = sbn.notification.extras
                 val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString().orEmpty()
                 val text = (extras.getCharSequence(Notification.EXTRA_BIG_TEXT) ?: extras.getCharSequence(Notification.EXTRA_TEXT))
@@ -105,15 +145,16 @@ class LauncherNotificationService : NotificationListenerService() {
             }.filter { it.title.isNotBlank() || it.text.isNotBlank() }.sortedByDescending { it.time }
         }
 
-        private fun isSilent(sbn: StatusBarNotification, ranking: RankingMap?): Boolean {
+        /** neither ongoing nor silent */
+        private fun isLoud(sbn: StatusBarNotification, ranking: RankingMap?): Boolean {
+            if (sbn.notification.flags and Notification.FLAG_ONGOING_EVENT != 0) return false
             val rank = Ranking()
-            return ranking != null && ranking.getRanking(sbn.key, rank) && rank.importance < NotificationManager.IMPORTANCE_DEFAULT
+            return ranking == null || !ranking.getRanking(sbn.key, rank) || rank.importance >= NotificationManager.IMPORTANCE_DEFAULT
         }
 
         private fun isShown(sbn: StatusBarNotification): Boolean {
             val flags = sbn.notification.flags
-            return flags and Notification.FLAG_ONGOING_EVENT == 0 && flags and Notification.FLAG_FOREGROUND_SERVICE == 0 &&
-                flags and Notification.FLAG_GROUP_SUMMARY == 0
+            return flags and Notification.FLAG_FOREGROUND_SERVICE == 0 && flags and Notification.FLAG_GROUP_SUMMARY == 0
         }
     }
 }

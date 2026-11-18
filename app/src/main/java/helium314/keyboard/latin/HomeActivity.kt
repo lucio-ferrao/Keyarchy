@@ -9,6 +9,7 @@ import android.content.pm.PackageManager
 import android.database.ContentObserver
 import android.content.Intent
 import android.graphics.Color
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.os.Bundle
 import android.os.Handler
@@ -276,7 +277,8 @@ class HomeActivity : Activity() {
             texts.addView(name, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
             texts.addView(tags, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
             row.addView(texts, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
-            // at the right, for a starred contact found by the search: an icon for each thing to do with them
+            // at the right, for a starred contact found by the search: an icon for each thing to do with them; for a
+            // notification, its buttons
             val actions = LinearLayout(this@HomeActivity).apply { orientation = LinearLayout.HORIZONTAL }
             row.addView(actions, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
             return RowHolder(row, icon, name, tags, actions)
@@ -305,6 +307,25 @@ class HomeActivity : Activity() {
                     setPadding((6 * dp).toInt(), (6 * dp).toInt(), (6 * dp).toInt(), (6 * dp).toInt())
                     setOnClickListener { mode.open(action) }
                 }, LinearLayout.LayoutParams((40 * dp).toInt(), (40 * dp).toInt()).apply { marginStart = (6 * dp).toInt() })
+            }
+            val notification = app.notification ?: return
+            for (action in notification.actions) {
+                holder.actions.addView(TextView(this@HomeActivity).apply {
+                    text = action.title
+                    setTextColor(Color.argb(210, 255, 255, 255))
+                    textSize = 14f
+                    useKeyboardFont()
+                    maxLines = 1
+                    setShadowLayer(4 * dp, 0f, 0f, Color.BLACK)
+                    background = GradientDrawable().apply {
+                        cornerRadius = 16 * dp
+                        setColor(Color.argb(50, 255, 255, 255))
+                    }
+                    setPadding((12 * dp).toInt(), (6 * dp).toInt(), (12 * dp).toInt(), (6 * dp).toInt())
+                    setOnClickListener { notification.run(action) }
+                }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
+                    marginStart = (6 * dp).toInt()
+                })
             }
         }
     }
