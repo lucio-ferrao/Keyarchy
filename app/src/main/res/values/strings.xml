@@ -391,6 +391,7 @@
     <string name="silent_notifications">Silent notifications</string>
     <string name="notification_actions">Notification actions</string>
     <string name="contact_accounts">Contact accounts</string>
+    <string name="home_keyboard">Show or hide the keyboard</string>
     <string name="calendars">Calendars</string>
     <string name="mousarchy">Mousarchy</string>
     <string name="mousarchy_missing">This build has no Mousarchy.</string>

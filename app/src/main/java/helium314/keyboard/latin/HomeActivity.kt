@@ -20,6 +20,7 @@ import android.text.InputType
 import android.text.TextWatcher
 import android.text.Editable
 import android.text.TextUtils
+import android.view.Display
 import android.view.Gravity
 import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
@@ -45,6 +46,10 @@ import android.widget.HorizontalScrollView
  */
 class HomeActivity : Activity() {
     private lateinit var field: EditText
+    /** on an external display: hides and shows the keyboard ([keyboardHidden]) */
+    private lateinit var keyboardButton: ImageView
+    /** the keyboard hidden by [keyboardButton]: it is not opened again until shown by it or a tap on the field */
+    private var keyboardHidden = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -134,7 +139,18 @@ class HomeActivity : Activity() {
             addView(panelActions)
         })
         root.addView(panel, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
-        root.addView(field, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
+        keyboardButton = ImageView(this).apply {
+            setImageResource(R.drawable.ic_home_keyboard)
+            setBackgroundColor(Color.argb(170, 20, 20, 20))
+            setPadding((12 * dp).toInt(), (10 * dp).toInt(), (12 * dp).toInt(), (10 * dp).toInt())
+            contentDescription = getString(R.string.home_keyboard)
+            setOnClickListener { toggleKeyboard() }
+        }
+        root.addView(LinearLayout(this).apply {
+            orientation = LinearLayout.HORIZONTAL
+            addView(field, LinearLayout.LayoutParams(0, LinearLayout.LayoutParams.MATCH_PARENT, 1f))
+            addView(keyboardButton, LinearLayout.LayoutParams(LinearLayout.LayoutParams.WRAP_CONTENT, LinearLayout.LayoutParams.MATCH_PARENT))
+        }, LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT))
         // above the keyboard and below the status bar
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) root.setOnApplyWindowInsetsListener { view, insets ->
             val bars = insets.getInsets(WindowInsets.Type.systemBars())
@@ -143,7 +159,8 @@ class HomeActivity : Activity() {
             // the keyboard never hides here, but Android hides it itself on back (predictive back): show it again, with
             // the search cleared, as back does
             val imeShown = insets.isVisible(WindowInsets.Type.ime())
-            if (keyboardWasShown && !imeShown && hasWindowFocus()) view.post {
+            if (imeShown) keyboardHidden = false
+            if (keyboardWasShown && !imeShown && hasWindowFocus() && !keyboardHidden) view.post {
                 if (!hasWindowFocus()) return@post
                 field.text.clear()
                 openKeyboard()
@@ -371,7 +388,25 @@ class HomeActivity : Activity() {
         field.text.clear()
         followKeyboard()
         contentResolver.registerContentObserver(Settings.Secure.getUriFor(Settings.Secure.DEFAULT_INPUT_METHOD), false, keyboardObserver)
+        val external = onExternalDisplay()
+        keyboardButton.visibility = if (external) android.view.View.VISIBLE else android.view.View.GONE
+        if (!external) keyboardHidden = false
         openKeyboard()
+    }
+
+    /** on a monitor connected to the phone, not on its own screen */
+    @Suppress("DEPRECATION") // the display of this activity's window, also before Android 11
+    private fun onExternalDisplay() = windowManager.defaultDisplay.displayId != Display.DEFAULT_DISPLAY
+
+    /** the button on an external display: hides the keyboard, or shows it again */
+    private fun toggleKeyboard() {
+        if (keyboardWasShown) {
+            keyboardHidden = true
+            getSystemService(InputMethodManager::class.java).hideSoftInputFromWindow(field.windowToken, 0)
+        } else {
+            keyboardHidden = false
+            openKeyboard()
+        }
     }
 
     override fun onPause() {
@@ -402,6 +437,7 @@ class HomeActivity : Activity() {
      */
     private fun openKeyboard() {
         field.requestFocus()
+        if (keyboardHidden) return
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && window.decorView.hasWindowFocus()) {
             window.insetsController?.controlWindowInsetsAnimation(WindowInsets.Type.ime(), 0, LinearInterpolator(), null,
                 object : WindowInsetsAnimationControlListener {

@@ -565,6 +565,7 @@
     <string name="silent_notifications">Notificações silenciosas</string>
     <string name="notification_actions">Ações das notificações</string>
     <string name="contact_accounts">Contas de contactos</string>
+    <string name="home_keyboard">Mostrar ou esconder o teclado</string>
     <string name="calendars">Calendários</string>
     <string name="mousarchy">Mousarchy</string>
     <string name="mousarchy_missing">Esta versão não tem o Mousarchy.</string>
