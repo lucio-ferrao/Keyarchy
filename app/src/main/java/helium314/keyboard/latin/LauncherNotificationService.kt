@@ -105,25 +105,9 @@ class LauncherNotificationService : NotificationListenerService() {
         }
 
         /** the apps whose silent and ongoing notifications are in the list, set in the settings ("Silent notifications") */
-        private const val PREF_SILENT_APPS = "app_search_silent_notification_apps"
-        /** whether Home Assistant was turned on in [PREF_SILENT_APPS], once: so turning it off afterwards stays */
-        private const val PREF_SILENT_APPS_DEFAULTS = "app_search_silent_notification_apps_defaults"
-        private const val HOME_ASSISTANT_PACKAGE = "io.homeassistant.companion.android"
-
-        /** the apps turned on in "Silent notifications"; Home Assistant is on from the start, for the buttons of the gate */
-        fun silentApps(context: Context): Set<String> {
-            val prefs = context.prefs()
-            if (!prefs.getBoolean(PREF_SILENT_APPS_DEFAULTS, false)) prefs.edit {
-                putStringSet(PREF_SILENT_APPS, prefs.getStringSet(PREF_SILENT_APPS, emptySet())!! + HOME_ASSISTANT_PACKAGE)
-                putBoolean(PREF_SILENT_APPS_DEFAULTS, true)
-            }
-            return prefs.getStringSet(PREF_SILENT_APPS, emptySet())!!
-        }
-
-        fun setSilentShown(context: Context, packageName: String, shown: Boolean) {
-            val enabled = silentApps(context)
-            context.prefs().edit { putStringSet(PREF_SILENT_APPS, if (shown) enabled + packageName else enabled - packageName) }
-        }
+        val silentApps = ChosenApps("app_search_silent_notification_apps")
+        /** the apps whose notifications show their buttons on the home screen, set in the settings ("Notification actions") */
+        val actionApps = ChosenApps("app_search_notification_action_apps")
 
         /**
          * The notifications in the status bar, newest first, without group summaries and those of foreground services;
@@ -134,8 +118,8 @@ class LauncherNotificationService : NotificationListenerService() {
             val service = instance ?: return emptyList()
             val notifications = try { service.activeNotifications } catch (e: Exception) { null } ?: return emptyList()
             val ranking = try { service.currentRanking } catch (e: Exception) { null }
-            val silentApps = silentApps(service)
-            return notifications.filter { isShown(it) && (it.packageName in silentApps || isLoud(it, ranking)) }.map { sbn ->
+            val silent = silentApps.get(service)
+            return notifications.filter { isShown(it) && (it.packageName in silent || isLoud(it, ranking)) }.map { sbn ->
                 val extras = sbn.notification.extras
                 val title = extras.getCharSequence(Notification.EXTRA_TITLE)?.toString().orEmpty()
                 val text = (extras.getCharSequence(Notification.EXTRA_BIG_TEXT) ?: extras.getCharSequence(Notification.EXTRA_TEXT))
@@ -156,5 +140,26 @@ class LauncherNotificationService : NotificationListenerService() {
             val flags = sbn.notification.flags
             return flags and Notification.FLAG_FOREGROUND_SERVICE == 0 && flags and Notification.FLAG_GROUP_SUMMARY == 0
         }
+    }
+}
+
+private const val HOME_ASSISTANT_PACKAGE = "io.homeassistant.companion.android"
+
+/** Apps turned on in a screen of the settings, by package; Home Assistant is on from the start, for the buttons of the gate. */
+class ChosenApps(private val pref: String) {
+    fun get(context: Context): Set<String> {
+        val prefs = context.prefs()
+        // Home Assistant turned on once, so turning it off afterwards stays
+        val defaults = pref + "_defaults"
+        if (!prefs.getBoolean(defaults, false)) prefs.edit {
+            putStringSet(pref, prefs.getStringSet(pref, emptySet())!! + HOME_ASSISTANT_PACKAGE)
+            putBoolean(defaults, true)
+        }
+        return prefs.getStringSet(pref, emptySet())!!
+    }
+
+    fun set(context: Context, packageName: String, on: Boolean) {
+        val enabled = get(context)
+        context.prefs().edit { putStringSet(pref, if (on) enabled + packageName else enabled - packageName) }
     }
 }

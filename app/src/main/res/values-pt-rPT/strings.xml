@@ -563,6 +563,8 @@
     <string name="launcher_open_in_termarchy">%1$s no Termarchy</string>
     <string name="app_shortcuts">Atalhos das apps</string>
     <string name="silent_notifications">Notificações silenciosas</string>
+    <string name="notification_actions">Ações das notificações</string>
+    <string name="contact_accounts">Contas de contactos</string>
     <string name="calendars">Calendários</string>
     <string name="mousarchy">Mousarchy</string>
     <string name="mousarchy_missing">Esta versão não tem o Mousarchy.</string>

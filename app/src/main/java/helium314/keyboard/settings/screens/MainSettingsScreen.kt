@@ -44,6 +44,8 @@ fun MainSettingsScreen(
     onClickDictionaries: () -> Unit,
     onClickAppShortcuts: () -> Unit,
     onClickSilentNotifications: () -> Unit,
+    onClickNotificationActions: () -> Unit,
+    onClickContactAccounts: () -> Unit,
     onClickCalendars: () -> Unit,
     onClickMousarchy: () -> Unit,
     onClickBack: () -> Unit,
@@ -118,6 +120,16 @@ fun MainSettingsScreen(
                     icon = R.drawable.ic_notifications_silent
                 ) { NextScreenIcon() }
                 Preference(
+                    name = stringResource(R.string.notification_actions),
+                    onClick = onClickNotificationActions,
+                    icon = R.drawable.ic_notification_actions
+                ) { NextScreenIcon() }
+                Preference(
+                    name = stringResource(R.string.contact_accounts),
+                    onClick = onClickContactAccounts,
+                    icon = R.drawable.ic_contact_accounts
+                ) { NextScreenIcon() }
+                Preference(
                     name = stringResource(R.string.calendars),
                     onClick = onClickCalendars,
                     icon = R.drawable.ic_calendar
@@ -148,7 +160,7 @@ private fun PreviewScreen() {
     initPreview(LocalContext.current)
     Theme(previewDark) {
         Surface {
-            MainSettingsScreen({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
+            MainSettingsScreen({}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {})
         }
     }
 }

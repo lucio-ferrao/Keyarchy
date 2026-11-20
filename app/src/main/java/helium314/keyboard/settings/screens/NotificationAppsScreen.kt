@@ -28,7 +28,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.graphics.drawable.toBitmap
-import helium314.keyboard.latin.LauncherNotificationService
+import helium314.keyboard.latin.ChosenApps
 import helium314.keyboard.latin.R
 import helium314.keyboard.settings.SearchScreen
 
@@ -36,28 +36,30 @@ import helium314.keyboard.settings.SearchScreen
 private class NotifyingApp(val packageName: String, val name: String, val icon: Drawable?)
 
 /**
- * The apps, each with a switch to show its silent and ongoing notifications in the list of the launcher mode or not
- * (only Home Assistant on at first).
+ * The apps, each with a switch for what [chosen] turns on for its notifications: showing the silent and ongoing ones
+ * in the list of the launcher mode, or their buttons on the home screen (only Home Assistant on at first).
  */
 @Composable
-fun SilentNotificationsScreen(
+fun NotificationAppsScreen(
     onClickBack: () -> Unit,
+    title: Int,
+    chosen: ChosenApps,
 ) {
     val ctx = LocalContext.current
     val apps = remember { launcherApps(ctx) }
     SearchScreen(
         onClickBack = onClickBack,
-        title = { Text(stringResource(R.string.silent_notifications)) },
+        title = { Text(stringResource(title)) },
         filteredItems = { term -> apps.filter { it.name.contains(term, true) } },
-        itemContent = { app -> NotifyingAppRow(app) },
+        itemContent = { app -> NotifyingAppRow(app, chosen) },
     )
 }
 
 @Composable
-private fun NotifyingAppRow(app: NotifyingApp) {
+private fun NotifyingAppRow(app: NotifyingApp, chosen: ChosenApps) {
     val ctx = LocalContext.current
     var shown by remember {
-        mutableStateOf(app.packageName in LauncherNotificationService.silentApps(ctx))
+        mutableStateOf(app.packageName in chosen.get(ctx))
     }
     Row(Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 8.dp), verticalAlignment = Alignment.CenterVertically) {
         app.icon?.let { Image(it.toBitmap(96, 96).asImageBitmap(), null, Modifier.size(32.dp)) }
@@ -67,7 +69,7 @@ private fun NotifyingAppRow(app: NotifyingApp) {
             checked = shown,
             onCheckedChange = {
                 shown = it
-                LauncherNotificationService.setSilentShown(ctx, app.packageName, it)
+                chosen.set(ctx, app.packageName, it)
             }
         )
     }

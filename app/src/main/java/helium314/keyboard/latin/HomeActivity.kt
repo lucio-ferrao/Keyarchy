@@ -14,12 +14,14 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.SystemClock
 import android.provider.Settings
 import android.text.InputType
 import android.text.TextWatcher
 import android.text.Editable
 import android.text.TextUtils
 import android.view.Gravity
+import android.view.HapticFeedbackConstants
 import android.view.ViewGroup
 import android.view.WindowInsets
 import android.widget.ImageView
@@ -223,6 +225,12 @@ class HomeActivity : Activity() {
     }
     private var results = emptyList<AppLauncherMode.App>()
 
+    /**
+     * The buttons of notifications just tapped ("notification key|button"), with the time of the notification then: they
+     * show as done until the notification changes or for [ACTION_DONE_MS], so a second tap does not run them again.
+     */
+    private val tappedActions = mutableMapOf<String, Pair<Long, Long>>()
+
     /** the search text the list was last shown for, null to show the next list from the bottom */
     private var shownQuery: String? = null
 
@@ -278,7 +286,7 @@ class HomeActivity : Activity() {
             texts.addView(tags, LinearLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT))
             row.addView(texts, LinearLayout.LayoutParams(0, ViewGroup.LayoutParams.WRAP_CONTENT, 1f))
             // at the right, for a starred contact found by the search: an icon for each thing to do with them; for a
-            // notification, its buttons
+            // notification of an app turned on in "Notification actions", its buttons
             val actions = LinearLayout(this@HomeActivity).apply { orientation = LinearLayout.HORIZONTAL }
             row.addView(actions, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT))
             return RowHolder(row, icon, name, tags, actions)
@@ -308,10 +316,16 @@ class HomeActivity : Activity() {
                     setOnClickListener { mode.open(action) }
                 }, LinearLayout.LayoutParams((40 * dp).toInt(), (40 * dp).toInt()).apply { marginStart = (6 * dp).toInt() })
             }
-            val notification = app.notification ?: return
+            val notification = app.notification?.takeIf { it.packageName in LauncherNotificationService.actionApps.get(this@HomeActivity) }
+                ?: return
+            val now = SystemClock.uptimeMillis()
             for (action in notification.actions) {
+                val tapped = "${notification.key}|${action.title}"
+                val done = tappedActions[tapped]?.let { (time, at) -> time == notification.time && now - at < ACTION_DONE_MS } == true
                 holder.actions.addView(TextView(this@HomeActivity).apply {
-                    text = action.title
+                    text = if (done) "✓ ${action.title}" else action.title
+                    alpha = if (done) 0.5f else 1f
+                    isEnabled = !done
                     setTextColor(Color.argb(210, 255, 255, 255))
                     textSize = 14f
                     useKeyboardFont()
@@ -322,7 +336,18 @@ class HomeActivity : Activity() {
                         setColor(Color.argb(50, 255, 255, 255))
                     }
                     setPadding((12 * dp).toInt(), (6 * dp).toInt(), (12 * dp).toInt(), (6 * dp).toInt())
-                    setOnClickListener { notification.run(action) }
+                    setOnClickListener {
+                        performHapticFeedback(if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) HapticFeedbackConstants.CONFIRM
+                            else HapticFeedbackConstants.VIRTUAL_KEY)
+                        notification.run(action)
+                        tappedActions[tapped] = notification.time to SystemClock.uptimeMillis()
+                        notifyDataSetChanged()
+                        // back to normal when the time is up, if the notification is still the same
+                        list.postDelayed({
+                            tappedActions.remove(tapped)
+                            notifyDataSetChanged()
+                        }, ACTION_DONE_MS)
+                    }
                 }, LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT).apply {
                     marginStart = (6 * dp).toInt()
                 })
@@ -389,6 +414,8 @@ class HomeActivity : Activity() {
     }
 
     companion object {
+        /** how long a tapped button of a notification shows as done */
+        private const val ACTION_DONE_MS = 5000L
         private const val PRIVATE_IME_OPTIONS = "helium314.keyboard.home"
         private var instance: HomeActivity? = null
         /** the request code of [withPermission] (0 is the calendar) */

@@ -13,13 +13,16 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import helium314.keyboard.latin.LauncherNotificationService
+import helium314.keyboard.latin.R
 import helium314.keyboard.latin.common.LocaleUtils.constructLocale
 import helium314.keyboard.latin.settings.SettingsSubtype.Companion.toSettingsSubtype
 import helium314.keyboard.latin.settings.getTransitionAnimationScale
 import helium314.keyboard.settings.screens.AboutScreen
 import helium314.keyboard.settings.screens.AdvancedSettingsScreen
 import helium314.keyboard.settings.screens.AppShortcutsScreen
-import helium314.keyboard.settings.screens.SilentNotificationsScreen
+import helium314.keyboard.settings.screens.ContactAccountsScreen
+import helium314.keyboard.settings.screens.NotificationAppsScreen
 import helium314.keyboard.settings.screens.CalendarsScreen
 import helium314.keyboard.settings.screens.MousarchyScreen
 import helium314.keyboard.settings.screens.AppearanceScreen
@@ -84,6 +87,8 @@ fun SettingsNavHost(
                 onClickDictionaries = { navController.navigate(SettingsDestination.Dictionaries) },
                 onClickAppShortcuts = { navController.navigate(SettingsDestination.AppShortcuts) },
                 onClickSilentNotifications = { navController.navigate(SettingsDestination.SilentNotifications) },
+                onClickNotificationActions = { navController.navigate(SettingsDestination.NotificationActions) },
+                onClickContactAccounts = { navController.navigate(SettingsDestination.ContactAccounts) },
                 onClickCalendars = { navController.navigate(SettingsDestination.Calendars) },
                 onClickMousarchy = { navController.navigate(SettingsDestination.Mousarchy) },
                 onClickBack = ::goBack,
@@ -114,7 +119,13 @@ fun SettingsNavHost(
             AppShortcutsScreen(onClickBack = ::goBack)
         }
         composable(SettingsDestination.SilentNotifications) {
-            SilentNotificationsScreen(onClickBack = ::goBack)
+            NotificationAppsScreen(onClickBack = ::goBack, R.string.silent_notifications, LauncherNotificationService.silentApps)
+        }
+        composable(SettingsDestination.NotificationActions) {
+            NotificationAppsScreen(onClickBack = ::goBack, R.string.notification_actions, LauncherNotificationService.actionApps)
+        }
+        composable(SettingsDestination.ContactAccounts) {
+            ContactAccountsScreen(onClickBack = ::goBack)
         }
         composable(SettingsDestination.Calendars) {
             CalendarsScreen(onClickBack = ::goBack)
@@ -186,6 +197,8 @@ object SettingsDestination {
     const val Dictionaries = "dictionaries"
     const val AppShortcuts = "app_shortcuts"
     const val SilentNotifications = "silent_notifications"
+    const val NotificationActions = "notification_actions"
+    const val ContactAccounts = "contact_accounts"
     const val Calendars = "calendars"
     const val Mousarchy = "mousarchy"
     val navTarget = MutableStateFlow(Settings)

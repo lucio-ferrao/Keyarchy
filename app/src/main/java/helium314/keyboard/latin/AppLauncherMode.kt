@@ -469,7 +469,7 @@ class AppLauncherMode(private val context: Context) : StripSearch {
         // messages that arrived while the mode was closed (before the apps were loaded, for instance) count too
         if (bump(context, LauncherNotificationService.entries())) lastUsed = readTimes(context, PREF_LAST_USED)
         val ranked = chosenFirst(withNotifications(alternativesFirst(withSettings(filter(apps, query.toString(), counts, lastUsed, dismissedRecent, byId = true))),
-            normalize(query.toString().trim())))
+            normalize(query.toString().trim())) + contactResults())
         results = withEvents(listOfNotNull(urlEntry(), privateSpaceEntry()) + patternEntries() + withPlayers(ranked))
         // nothing found: the text searched in the browser
         if (results.isEmpty() && query.isNotBlank()) searchEntry(query.toString().trim())?.let { results = listOf(it) }
@@ -612,15 +612,16 @@ class AppLauncherMode(private val context: Context) : StripSearch {
                 context.getString(R.string.launcher_open_in_termarchy, app.label), app.component, app.user, termarchy.icon,
                 null, emptyList(), run = { startShortcut(app); recordUse(app) }))
         }
-        if (app.whatsAppDataId == null) return emptyList()
-        val (numbers, addresses, contactIds) = contactDetails
-            ?: Triple(starredData(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE, ContactsContract.CommonDataKinds.Phone.NUMBER),
-                starredData(ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE,
-                    ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS),
-                starredData(WHATSAPP_MIME_TYPE, ContactsContract.Data.CONTACT_ID))
-                .also { contactDetails = it }
-        val number = numbers[app.originalLabel]
-        val address = addresses[app.originalLabel]?.replace('\n', ' ')
+        if (app.whatsAppDataId == null && app.contactId == null) return emptyList()
+        val (number, address, contactId) = app.contactId?.let { contactData(it) } ?: run {
+            val (numbers, addresses, contactIds) = contactDetails
+                ?: Triple(starredData(ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE, ContactsContract.CommonDataKinds.Phone.NUMBER),
+                    starredData(ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE,
+                        ContactsContract.CommonDataKinds.StructuredPostal.FORMATTED_ADDRESS),
+                    starredData(WHATSAPP_MIME_TYPE, ContactsContract.Data.CONTACT_ID))
+                    .also { contactDetails = it }
+            Triple(numbers[app.originalLabel], addresses[app.originalLabel]?.replace('\n', ' '), contactIds[app.originalLabel])
+        }
         return listOfNotNull(
             number?.let { entry("call", context.getString(R.string.launcher_call_person, app.label, it),
                 Intent(Intent.ACTION_DIAL, Uri.parse("tel:" + Uri.encode(it.replace(" ", ""))))) },
@@ -629,9 +630,43 @@ class AppLauncherMode(private val context: Context) : StripSearch {
                 app.whatsAppDataId) },
             address?.let { entry("drive", context.getString(R.string.launcher_drive, app.label, it),
                 Intent(Intent.ACTION_VIEW, Uri.parse("google.navigation:q=" + Uri.encode(it))).setPackage(MAPS_PACKAGE)) },
-            contactIds[app.originalLabel]?.let { entry("contact", context.getString(R.string.launcher_open_contact, app.label),
+            // a contact without WhatsApp opens in the contacts app already
+            contactId?.takeIf { app.whatsAppDataId != null }?.let { entry("contact", context.getString(R.string.launcher_open_contact, app.label),
                 Intent(Intent.ACTION_VIEW, ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, it.toLong()))) },
         )
+    }
+
+    /** the default phone number and address (else the first ones) of the contact [id], and the id itself */
+    private fun contactData(id: Long): Triple<String?, String?, String> {
+        var number: String? = null
+        var address: String? = null
+        try {
+            context.contentResolver.query(ContactsContract.Data.CONTENT_URI,
+                arrayOf(ContactsContract.Data.MIMETYPE, ContactsContract.Data.DATA1),
+                ContactsContract.Data.CONTACT_ID + " = ? AND " + ContactsContract.Data.MIMETYPE + " IN (?, ?)",
+                arrayOf(id.toString(), ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE,
+                    ContactsContract.CommonDataKinds.StructuredPostal.CONTENT_ITEM_TYPE),
+                ContactsContract.Data.IS_SUPER_PRIMARY + " DESC, " + ContactsContract.Data.IS_PRIMARY + " DESC"
+            )?.use { cursor ->
+                while (cursor.moveToNext()) {
+                    val value = cursor.getString(1)?.takeIf { it.isNotBlank() } ?: continue
+                    if (cursor.getString(0) == ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE) number = number ?: value
+                    else address = address ?: value.replace('\n', ' ')
+                }
+            }
+        } catch (e: SecurityException) {
+            Log.w(TAG, "no permission to read contacts", e)
+        }
+        return Triple(number, address, id.toString())
+    }
+
+    /**
+     * The contacts of the accounts turned on in "Contact accounts" that match the search, after the apps; none without
+     * a search, and not those in the list already (the starred ones with WhatsApp).
+     */
+    private fun contactResults(): List<App> {
+        if (query.isBlank()) return emptyList()
+        return filter(accountContacts, query.toString(), counts, lastUsed, dismissedRecent).take(MAX_CONTACTS)
     }
     /** the default phone numbers, addresses and contact ids of the starred contacts, read again each time the list is shown */
     private var contactDetails: Triple<Map<String, String>, Map<String, String>, Map<String, String>>? = null
@@ -882,8 +917,8 @@ class AppLauncherMode(private val context: Context) : StripSearch {
         app.intent?.let {
             // an SMS conversation: tap its message box once open, so the keyboard stays
             if (app.key.startsWith("sms|")) ScreenAgentService.focusMessageFieldSoon(app.component.packageName)
-            // a screen of the Settings is ranked by its use, as the apps
-            if (app.key.startsWith(SETTINGS_KEY)) recordUse(app)
+            // a screen of the Settings or a contact is ranked by its use, as the apps
+            if (app.key.startsWith(SETTINGS_KEY) || app.contactId != null) recordUse(app)
             startActivity(it)
             return
         }
@@ -1459,7 +1494,9 @@ class AppLauncherMode(private val context: Context) : StripSearch {
               /** [run] keeps the mode open, to show its result there (a port forward asked of Termarchy) */
               val staysOpen: Boolean = false,
               /** for a shortcut of an app (a long press on its icon) or one pinned to Keyarchy */
-              val shortcut: Shortcut? = null) {
+              val shortcut: Shortcut? = null,
+              /** for a contact of an account turned on in "Contact accounts": its id ([ContactsContract.Contacts._ID]) */
+              val contactId: Long? = null) {
         /** the file of the processed icon in the cache, to show the list at once after a restart of the keyboard */
         var iconFile: String? = null
         /** for a person: the newest message from them in the status bar, shown in their entry and opened by it */
@@ -1572,6 +1609,23 @@ class AppLauncherMode(private val context: Context) : StripSearch {
         }
         /** the calendars (their ids) whose events are left out of the list, set in the settings ("Calendars") */
         const val PREF_HIDDEN_CALENDARS = "app_search_hidden_calendars"
+        /** the accounts ("type|name") whose contacts the search finds, set in the settings ("Contact accounts") */
+        private const val PREF_CONTACT_ACCOUNTS = "app_search_contact_accounts"
+        /** the most contacts of [PREF_CONTACT_ACCOUNTS] shown for a search ("a" finds thousands) */
+        private const val MAX_CONTACTS = 30
+
+        fun contactAccounts(context: Context): Set<String> = context.prefs().getStringSet(PREF_CONTACT_ACCOUNTS, emptySet())!!
+
+        fun setContactAccount(context: Context, account: String, on: Boolean) {
+            val enabled = contactAccounts(context)
+            context.prefs().edit { putStringSet(PREF_CONTACT_ACCOUNTS, if (on) enabled + account else enabled - account) }
+        }
+
+        /** an account of contacts as kept in [PREF_CONTACT_ACCOUNTS] */
+        fun accountKey(type: String?, name: String?) = "${type.orEmpty()}|${name.orEmpty()}"
+
+        /** the contacts of [PREF_CONTACT_ACCOUNTS], loaded with the apps */
+        private var accountContacts = emptyList<App>()
 
         /**
          * Whether a shortcut is in the list: one pinned to Keyarchy always, one an app offers only for an app turned on in
@@ -1673,8 +1727,10 @@ class AppLauncherMode(private val context: Context) : StripSearch {
                     }
                     val loaded = loadApps(context)
                     saveApps(context, loaded)
+                    val contacts = loadAccountContacts(context, loaded)
                     main.post {
                         apps = loaded
+                        accountContacts = contacts
                         onAppsChanged?.invoke()
                     }
                 } catch (e: Exception) {
@@ -1861,6 +1917,71 @@ class AppLauncherMode(private val context: Context) : StripSearch {
                             info.isDynamic || info.isDeclaredInManifest || isCached, changedAt, detail)
                     ).also { it.iconFile = iconFile }
                 }
+            }
+        }
+
+        /**
+         * The contacts of the accounts turned on in "Contact accounts", without those already in [list] (the starred
+         * ones with WhatsApp): one with WhatsApp opens its chat, with the WhatsApp icon; one without opens in the
+         * contacts app, with its icon.
+         */
+        private fun loadAccountContacts(context: Context, list: List<App>): List<App> {
+            val accounts = contactAccounts(context)
+            if (accounts.isEmpty()) return emptyList()
+            val main = list.filter { it.shortcut == null && it.whatsAppDataId == null && it.user == Process.myUserHandle() }
+            val whatsApp = main.firstOrNull { it.component.packageName == "com.whatsapp" }
+            val contactsHandler = context.packageManager.resolveActivity(Intent(Intent.ACTION_VIEW, ContactsContract.Contacts.CONTENT_URI),
+                PackageManager.MATCH_DEFAULT_ONLY)?.activityInfo?.packageName
+            val contactsApp = main.firstOrNull { it.component.packageName == contactsHandler } ?: return emptyList()
+            val people = list.filter { it.whatsAppDataId != null }.map { it.originalLabel }.toSet()
+            val names = readStringMap(context, NAMES_FILE)
+            val tags = readStringMap(context, TAGS_FILE).mapValues { (_, v) -> v.split(' ').filter { it.isNotBlank() } }
+            return try {
+                val resolver = context.contentResolver
+                val ids = mutableSetOf<Long>()
+                resolver.query(ContactsContract.RawContacts.CONTENT_URI,
+                    arrayOf(ContactsContract.RawContacts.CONTACT_ID, ContactsContract.RawContacts.ACCOUNT_TYPE,
+                        ContactsContract.RawContacts.ACCOUNT_NAME),
+                    ContactsContract.RawContacts.DELETED + " = 0", null, null
+                )?.use { cursor ->
+                    while (cursor.moveToNext())
+                        if (accountKey(cursor.getString(1), cursor.getString(2)) in accounts) ids.add(cursor.getLong(0))
+                }
+                // the WhatsApp row of each contact, to open the chat
+                val chats = mutableMapOf<Long, Long>()
+                if (whatsApp != null) resolver.query(ContactsContract.Data.CONTENT_URI,
+                    arrayOf(ContactsContract.Data._ID, ContactsContract.Data.CONTACT_ID),
+                    ContactsContract.Data.MIMETYPE + " = ?", arrayOf(WHATSAPP_MIME_TYPE), null
+                )?.use { cursor ->
+                    while (cursor.moveToNext()) chats.putIfAbsent(cursor.getLong(1), cursor.getLong(0))
+                }
+                val contacts = mutableListOf<App>()
+                resolver.query(ContactsContract.Contacts.CONTENT_URI,
+                    arrayOf(ContactsContract.Contacts._ID, ContactsContract.Contacts.DISPLAY_NAME_PRIMARY), null, null, null
+                )?.use { cursor ->
+                    while (cursor.moveToNext()) {
+                        val id = cursor.getLong(0)
+                        if (id !in ids) continue
+                        val name = cursor.getString(1)?.takeIf { it.isNotBlank() } ?: continue
+                        if (name in people) continue
+                        val chat = chats[id]
+                        contacts.add(if (chat != null && whatsApp != null) {
+                            // the same id as a starred contact's chat, so a name or tags given to it stay if it is starred
+                            val kissId = "whatsapp://$name"
+                            App("contact|$id", kissId, name, whatsApp.component, whatsApp.user, whatsApp.icon, names[kissId],
+                                tags[kissId].orEmpty(), chat, contactId = id)
+                        } else {
+                            val kissId = "contact://$id"
+                            App("contact|$id", kissId, name, contactsApp.component, contactsApp.user, contactsApp.icon, names[kissId],
+                                tags[kissId].orEmpty(), contactId = id,
+                                intent = Intent(Intent.ACTION_VIEW, ContentUris.withAppendedId(ContactsContract.Contacts.CONTENT_URI, id)))
+                        })
+                    }
+                }
+                contacts
+            } catch (e: SecurityException) {
+                Log.w(TAG, "no permission to read contacts", e)
+                emptyList()
             }
         }
 
