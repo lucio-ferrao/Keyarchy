@@ -636,6 +636,26 @@ class AppLauncherMode(private val context: Context) : StripSearch {
         )
     }
 
+    /**
+     * Opens the WhatsApp chat of the WhatsApp row [dataId] of a contact by its phone number (from the id of WhatsApp in
+     * the row, number@s.whatsapp.net): WhatsApp opens the row itself only to close it again for some chats, so the row
+     * is opened only when it has no number.
+     */
+    private fun whatsAppChatIntent(dataId: Long): Intent {
+        val number = try {
+            context.contentResolver.query(ContentUris.withAppendedId(ContactsContract.Data.CONTENT_URI, dataId),
+                arrayOf(ContactsContract.Data.DATA1), null, null, null
+            )?.use { cursor -> if (cursor.moveToFirst()) cursor.getString(0) else null }
+        } catch (e: SecurityException) {
+            Log.w(TAG, "no permission to read contacts", e)
+            null
+        }?.takeIf { it.endsWith(WHATSAPP_USER_SUFFIX) }?.removeSuffix(WHATSAPP_USER_SUFFIX)?.takeIf { it.all(Char::isDigit) }
+        return if (number != null)
+            Intent(Intent.ACTION_VIEW, Uri.parse("https://api.whatsapp.com/send?phone=$number")).setPackage("com.whatsapp")
+        else Intent(Intent.ACTION_VIEW)
+            .setDataAndType(ContentUris.withAppendedId(ContactsContract.Data.CONTENT_URI, dataId), WHATSAPP_MIME_TYPE)
+    }
+
     /** the default phone number and address (else the first ones) of the contact [id], and the id itself */
     private fun contactData(id: Long): Triple<String?, String?, String> {
         var number: String? = null
@@ -950,9 +970,7 @@ class AppLauncherMode(private val context: Context) : StripSearch {
             if (app.element != null)
                 context.startActivity(elementIntent(app.element!!))
             else if (app.whatsAppDataId != null)
-                context.startActivity(Intent(Intent.ACTION_VIEW)
-                    .setDataAndType(ContentUris.withAppendedId(ContactsContract.Data.CONTENT_URI, app.whatsAppDataId), WHATSAPP_MIME_TYPE)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                context.startActivity(whatsAppChatIntent(app.whatsAppDataId).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
             else if (app.shortcut != null) startShortcut(app)
             else if (context.getSystemService(UserManager::class.java).isQuietModeEnabled(app.user)) launchWhenUnlocked(app)
             else context.getSystemService(LauncherApps::class.java).startMainActivity(app.component, app.user, null, null)
@@ -1652,6 +1670,8 @@ class AppLauncherMode(private val context: Context) : StripSearch {
         private const val ICON_VERSION = 2
         private const val TAGS_FILE = "etiquetas-kiss.json"
         private const val WHATSAPP_MIME_TYPE = "vnd.android.cursor.item/vnd.com.whatsapp.profile"
+        /** the end of the id of WhatsApp of a person in their WhatsApp row (data1), after the phone number */
+        private const val WHATSAPP_USER_SUFFIX = "@s.whatsapp.net"
         /** the Claude app, where a claude.ai link of a Claude Code conversation opens it */
         private const val CLAUDE_PACKAGE = "com.anthropic.claude"
         /** the Matrix ids of the contacts, by KISS id, for the saved list */
@@ -1986,8 +2006,8 @@ class AppLauncherMode(private val context: Context) : StripSearch {
         }
 
         /**
-         * The WhatsApp chats of the starred contacts, from the row WhatsApp adds to each contact it knows: opening that
-         * row goes straight to the chat. Shown with the WhatsApp icon.
+         * The WhatsApp chats of the starred contacts, from the row WhatsApp adds to each contact it knows, with the phone
+         * number that opens the chat ([whatsAppChatIntent]). Shown with the WhatsApp icon.
          */
         private fun whatsAppChats(context: Context, launchable: List<App>, names: Map<String, String>,
                                   tags: Map<String, List<String>>): List<App> {
