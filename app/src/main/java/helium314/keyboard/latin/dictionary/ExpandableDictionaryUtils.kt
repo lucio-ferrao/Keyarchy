@@ -15,9 +15,11 @@ object ExpandableDictionaryUtils {
 
     /** fill with dicts from file system, so we don't recreate on app start (misses changes that were made while different keyboard were active) */
     fun initUpToDateDicts(context: Context) {
+        // null before the first unlock after a reboot, when the files dir is still encrypted: the dicts are then
+        // simply recreated once
         val files = context.filesDir.listFiles {
             it.isDirectory && it.name.endsWith(".dict") && !it.name.startsWith(UserHistoryDictionary.NAME)
-        }!!
+        } ?: return
         val prefs = context.prefs() // SettingsValues not initialized at this point on app start
         if (!prefs.getBoolean(Settings.PREF_USE_CONTACTS, Defaults.PREF_USE_CONTACTS))
             files.forEach { if (it.name.startsWith(ContactsBinaryDictionary.NAME)) it.deleteRecursively() }
