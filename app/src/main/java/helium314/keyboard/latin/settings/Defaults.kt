@@ -82,8 +82,10 @@ object Defaults {
     const val PREF_ENABLE_SPLIT_KEYBOARD = false
     @JvmField
     val PREF_SPLIT_SPACER_SCALE = Array(4) { DEFAULT_SIZE_SCALE }
+    // Keyarchy: 82% in portrait (normal and folded), rows of keys as high as SwiftKey's (8.5 mm, were 10.4 mm on a
+    // Pixel 8 Pro); landscape as it was
     @JvmField
-    val PREF_KEYBOARD_HEIGHT_SCALE = Array(4) { DEFAULT_SIZE_SCALE }
+    val PREF_KEYBOARD_HEIGHT_SCALE = arrayOf(0.82f, DEFAULT_SIZE_SCALE, 0.82f, DEFAULT_SIZE_SCALE)
     @JvmField
     val PREF_BOTTOM_ROW_SCALE = Array(4) { DEFAULT_SIZE_SCALE }
     @JvmField
