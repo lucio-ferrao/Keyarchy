@@ -400,6 +400,7 @@
     <string name="mousarchy_pc_code">Code shown on the PC</string>
     <string name="mousarchy_pair">Pair</string>
     <string name="app_shortcuts_not_home">Only the home app can see the shortcuts of the apps: choose Keyarchy as home app (Settings › Apps › Default apps).</string>
+    <string name="launcher_stop_player">Stop %s</string>
     <string name="launcher_call">Call %s</string>
     <string name="launcher_alarm">Alarm at %s</string>
     <string name="launcher_timer">Timer for %s</string>

@@ -193,8 +193,14 @@ class AppLauncherMode(private val context: Context) : StripSearch {
     /** the players followed while the mode is open: the list is shown again when what they play changes */
     private var players = emptyList<MediaController>()
     private val playerCallback = object : MediaController.Callback() {
-        override fun onPlaybackStateChanged(state: PlaybackState?) = show()
-        override fun onMetadataChanged(metadata: MediaMetadata?) = show()
+        override fun onPlaybackStateChanged(state: PlaybackState?) {
+            bumpChangedPlayers()
+            show()
+        }
+        override fun onMetadataChanged(metadata: MediaMetadata?) {
+            bumpChangedPlayers()
+            show()
+        }
         override fun onSessionDestroyed() = show()
     }
     private val playersChanged = MediaSessionManager.OnActiveSessionsChangedListener { follow(it.orEmpty()) }
@@ -603,9 +609,15 @@ class AppLauncherMode(private val context: Context) : StripSearch {
      * For the list of the home screen: what else can be done with a starred contact, each shown as an icon at the right
      * of it: call the default number, the WhatsApp chat when a tap opens Element, driving to the default address, when
      * the contact has them, and the contact in the contacts app. For a skiff session of Termarchy with Claude, which a
-     * tap opens in the Claude app, the session in Termarchy.
+     * tap opens in the Claude app, the session in Termarchy. For a player that plays, a button that stops it.
      */
     fun personActions(app: App): List<App> {
+        if (app.key.startsWith(PLAYER_KEY)) {
+            val player = players.firstOrNull { it.packageName == app.component.packageName } ?: return emptyList()
+            val icon = context.getDrawable(R.drawable.ic_player_stop) ?: return emptyList()
+            return listOf(App("stop|${app.key}", "stop://${app.kissId}", context.getString(R.string.launcher_stop_player, app.label),
+                app.component, app.user, icon, null, emptyList(), staysOpen = true, run = { stopPlayer(player) }))
+        }
         if (app.shortcut?.agent?.claudeUrl != null) {
             val termarchy = appOf(app) ?: return emptyList()
             return listOf(App("termarchy|${app.key}", "termarchy://${app.kissId}",
@@ -1074,7 +1086,29 @@ class AppLauncherMode(private val context: Context) : StripSearch {
         players.forEach { it.unregisterCallback(playerCallback) }
         players = controllers
         players.forEach { it.registerCallback(playerCallback, mainHandler) }
+        bumpChangedPlayers()
         show()
+    }
+
+    /**
+     * A player whose song or state changed since it was last seen (also while the mode was closed) brings its app to
+     * the front of the recent ones, so it is at hand to stop it; one seen for the first time only if it plays.
+     */
+    private fun bumpChangedPlayers() {
+        var moved = false
+        for (player in players) {
+            val state = player.playbackState?.state
+            val signature = "$state|${player.metadata?.getString(MediaMetadata.METADATA_KEY_TITLE)}"
+            val before = playerSignatures[player.packageName]
+            if (before == signature) continue
+            val app = apps.firstOrNull { it.component.packageName == player.packageName && it.user == Process.myUserHandle() &&
+                it.shortcut == null && it.whatsAppDataId == null } ?: continue
+            playerSignatures[player.packageName] = signature
+            if (before == null && state !in PLAYING_STATES) continue
+            lastUsed[app.key] = System.currentTimeMillis()
+            moved = true
+        }
+        if (moved) saveTimes(context, PREF_LAST_USED, lastUsed)
     }
 
     /**
@@ -1083,9 +1117,8 @@ class AppLauncherMode(private val context: Context) : StripSearch {
      */
     private fun withPlayers(list: List<App>): List<App> {
         val q = normalize(query.toString().trim())
-        val playing = setOf(PlaybackState.STATE_PLAYING, PlaybackState.STATE_BUFFERING)
         val result = list.toMutableList()
-        for (player in players.filter { it.playbackState?.state in playing }) {
+        for (player in players.filter { it.playbackState?.state in PLAYING_STATES }) {
             val app = apps.firstOrNull { it.component.packageName == player.packageName && it.user == Process.myUserHandle() }
                 ?: continue
             val metadata = player.metadata
@@ -1093,7 +1126,7 @@ class AppLauncherMode(private val context: Context) : StripSearch {
             val artist = metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST)
                 ?: metadata?.getString(MediaMetadata.METADATA_KEY_ALBUM_ARTIST).orEmpty()
             val label = listOf(title, artist).filter { it.isNotBlank() }.joinToString(" · ").ifEmpty { app.label }
-            val entry = App("player|${player.packageName}", "player://${player.packageName}", label, app.component, app.user,
+            val entry = App("$PLAYER_KEY${player.packageName}", "player://${player.packageName}", label, app.component, app.user,
                 app.icon, null, app.rawTags, run = { openPlayer(player, app) })
             val i = result.indexOf(app)
             when {
@@ -1102,6 +1135,12 @@ class AppLauncherMode(private val context: Context) : StripSearch {
             }
         }
         return result
+    }
+
+    /** stops the player, or pauses it if it can't stop (it leaves the list either way) */
+    private fun stopPlayer(player: MediaController) {
+        val actions = player.playbackState?.actions ?: 0L
+        if (actions and PlaybackState.ACTION_STOP != 0L) player.transportControls.stop() else player.transportControls.pause()
     }
 
     /** the screen of the player that plays (its session activity), or else the player app */
@@ -1550,6 +1589,12 @@ class AppLauncherMode(private val context: Context) : StripSearch {
 
     companion object {
         private const val TAG = "app-launcher"
+        /** the start of the key of the entry of a player that plays */
+        private const val PLAYER_KEY = "player|"
+        /** the states of a player shown in the list (playing) */
+        private val PLAYING_STATES = setOf(PlaybackState.STATE_PLAYING, PlaybackState.STATE_BUFFERING)
+        /** what each player (by package) played when last seen, state and title, for [bumpChangedPlayers] */
+        private val playerSignatures = mutableMapOf<String, String>()
         private const val PREF_COUNTS = "app_search_launch_counts"
         /** a web address: optional scheme, a host with a dot and a top level domain of letters (or an IPv4), optional port and path */
         private val URL = Regex("""^(?:https?://)?(?:(?:[\p{L}\d-]+\.)+\p{L}{2,}|\d{1,3}(?:\.\d{1,3}){3}|localhost)(?::\d+)?(?:[/?#]\S*)?$""", RegexOption.IGNORE_CASE)
