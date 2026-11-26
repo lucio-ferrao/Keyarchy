@@ -49,6 +49,7 @@ import android.text.style.ForegroundColorSpan
 import android.text.style.StyleSpan
 import androidx.core.graphics.ColorUtils
 import android.view.Gravity
+import android.view.KeyEvent
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewConfiguration
@@ -609,14 +610,28 @@ class AppLauncherMode(private val context: Context) : StripSearch {
      * For the list of the home screen: what else can be done with a starred contact, each shown as an icon at the right
      * of it: call the default number, the WhatsApp chat when a tap opens Element, driving to the default address, when
      * the contact has them, and the contact in the contacts app. For a skiff session of Termarchy with Claude, which a
-     * tap opens in the Claude app, the session in Termarchy. For a player that plays, a button that stops it.
+     * tap opens in the Claude app, the session in Termarchy. For a player that plays, a button that stops it and one to
+     * the next song (if it can skip); for Spotify when it doesn't play, a button that plays it.
      */
     fun personActions(app: App): List<App> {
         if (app.key.startsWith(PLAYER_KEY)) {
             val player = players.firstOrNull { it.packageName == app.component.packageName } ?: return emptyList()
-            val icon = context.getDrawable(R.drawable.ic_player_stop) ?: return emptyList()
-            return listOf(App("stop|${app.key}", "stop://${app.kissId}", context.getString(R.string.launcher_stop_player, app.label),
-                app.component, app.user, icon, null, emptyList(), staysOpen = true, run = { stopPlayer(player) }))
+            val canSkip = (player.playbackState?.actions ?: 0L) and PlaybackState.ACTION_SKIP_TO_NEXT != 0L
+            val next = context.getDrawable(R.drawable.ic_player_next)?.takeIf { canSkip }?.let { icon ->
+                App("next|${app.key}", "next://${app.kissId}", context.getString(R.string.launcher_next_player, app.label),
+                    app.component, app.user, icon, null, emptyList(), staysOpen = true, run = { player.transportControls.skipToNext() })
+            }
+            val stop = context.getDrawable(R.drawable.ic_player_stop)?.let { icon ->
+                App("stop|${app.key}", "stop://${app.kissId}", context.getString(R.string.launcher_stop_player, app.label),
+                    app.component, app.user, icon, null, emptyList(), staysOpen = true, run = { stopPlayer(player) })
+            }
+            return listOfNotNull(stop, next)
+        }
+        if (app.component.packageName == SPOTIFY && app.user == Process.myUserHandle() && app.shortcut == null &&
+            app.whatsAppDataId == null && app.contactId == null) {
+            val icon = context.getDrawable(R.drawable.ic_player_play) ?: return emptyList()
+            return listOf(App("play|${app.key}", "play://${app.kissId}", context.getString(R.string.launcher_play_player, app.label),
+                app.component, app.user, icon, null, emptyList(), staysOpen = true, run = { playPlayer(SPOTIFY) }))
         }
         if (app.shortcut?.agent?.claudeUrl != null) {
             val termarchy = appOf(app) ?: return emptyList()
@@ -1143,6 +1158,17 @@ class AppLauncherMode(private val context: Context) : StripSearch {
         if (actions and PlaybackState.ACTION_STOP != 0L) player.transportControls.stop() else player.transportControls.pause()
     }
 
+    /**
+     * plays the player of [packageName]: by its media session if it has one (paused), or else by a play key sent to
+     * the app, which starts its last song
+     */
+    private fun playPlayer(packageName: String) {
+        players.firstOrNull { it.packageName == packageName }?.let { it.transportControls.play(); return }
+        for (action in listOf(KeyEvent.ACTION_DOWN, KeyEvent.ACTION_UP))
+            context.sendBroadcast(Intent(Intent.ACTION_MEDIA_BUTTON).setPackage(packageName)
+                .putExtra(Intent.EXTRA_KEY_EVENT, KeyEvent(action, KeyEvent.KEYCODE_MEDIA_PLAY)))
+    }
+
     /** the screen of the player that plays (its session activity), or else the player app */
     private fun openPlayer(player: MediaController, app: App) {
         try {
@@ -1591,6 +1617,7 @@ class AppLauncherMode(private val context: Context) : StripSearch {
         private const val TAG = "app-launcher"
         /** the start of the key of the entry of a player that plays */
         private const val PLAYER_KEY = "player|"
+        private const val SPOTIFY = "com.spotify.music"
         /** the states of a player shown in the list (playing) */
         private val PLAYING_STATES = setOf(PlaybackState.STATE_PLAYING, PlaybackState.STATE_BUFFERING)
         /** what each player (by package) played when last seen, state and title, for [bumpChangedPlayers] */

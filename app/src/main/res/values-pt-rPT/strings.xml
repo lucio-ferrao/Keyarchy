@@ -539,6 +539,8 @@
     <string name="screen_agent_label">Conversas do Keyarchy</string>
     <string name="screen_agent_description">Quando se abre uma conversa a partir do modo launcher, toca na caixa de mensagem para o teclado ficar aberto.</string>
     <string name="launcher_stop_player">Parar %s</string>
+    <string name="launcher_next_player">Música seguinte no %s</string>
+    <string name="launcher_play_player">Tocar %s</string>
     <string name="launcher_call">Ligar %s</string>
     <string name="launcher_alarm">Alarme para as %s</string>
     <string name="launcher_timer">Temporizador de %s</string>
