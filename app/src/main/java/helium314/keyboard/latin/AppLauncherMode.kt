@@ -1083,7 +1083,7 @@ class AppLauncherMode(private val context: Context) : StripSearch {
 
     /**
      * follows what [controllers] play, instead of the players followed so far, but the session of Keyarchy itself (the
-     * [CarPlayGuard]); shows the list again
+     * [PlayGuard]); shows the list again
      */
     private fun follow(controllers: List<MediaController>) {
         players.forEach { it.unregisterCallback(playerCallback) }

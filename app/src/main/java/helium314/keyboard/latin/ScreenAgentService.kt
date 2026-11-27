@@ -15,9 +15,9 @@ import android.view.accessibility.AccessibilityWindowInfo
 /**
  * Accessibility service of the launcher mode: when a chat is opened from it, taps the message box so the keyboard
  * stays; taps the send button on Enter in apps that ignore Enter; reads the name of a chat the keyboard opens in, to
- * move that person forward in the list; tells the launcher mode about clicks in the app below, to leave it; keeps
- * the app last in front, for the hide key of the home screen to go back to it; draws the [NotificationIcons]; and
- * keeps the car from starting music ([CarPlayGuard]). (The name is kept from the screen agent it was part of, so the
+ * move that person forward in the list; tells the launcher mode about clicks in the app below, to leave it; keeps the
+ * app last in front, for the hide key of the home screen to go back to it; draws the [NotificationIcons]; and keeps
+ * Bluetooth devices from starting music ([PlayGuard]). (The name is kept from the screen agent it was part of, so the
  * service stays enabled.)
  */
 class ScreenAgentService : AccessibilityService() {
@@ -82,22 +82,22 @@ class ScreenAgentService : AccessibilityService() {
     var notificationIcons: NotificationIcons? = null
         private set
 
-    /** keeps the car from starting music, while the service runs */
-    private var carPlayGuard: CarPlayGuard? = null
+    /** keeps Bluetooth devices from starting music, while the service runs */
+    private var playGuard: PlayGuard? = null
 
     override fun onServiceConnected() {
         instance = this
         notificationIcons = NotificationIcons(this).also { it.start() }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S)
-            carPlayGuard = CarPlayGuard(this).also { it.start() }
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+            playGuard = PlayGuard(this).also { it.start() }
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
         instance = null
         notificationIcons?.stop()
         notificationIcons = null
-        carPlayGuard?.stop()
-        carPlayGuard = null
+        playGuard?.stop()
+        playGuard = null
         return super.onUnbind(intent)
     }
 
