@@ -1081,10 +1081,13 @@ class AppLauncherMode(private val context: Context) : StripSearch {
     /** the notification listener, whose access also gives the players playing (media sessions) */
     private fun notificationListener() = ComponentName(context, LauncherNotificationService::class.java)
 
-    /** follows what [controllers] play, instead of the players followed so far; shows the list again */
+    /**
+     * follows what [controllers] play, instead of the players followed so far, but the session of Keyarchy itself (the
+     * [CarPlayGuard]); shows the list again
+     */
     private fun follow(controllers: List<MediaController>) {
         players.forEach { it.unregisterCallback(playerCallback) }
-        players = controllers
+        players = controllers.filter { it.packageName != context.packageName }
         players.forEach { it.registerCallback(playerCallback, mainHandler) }
         bumpChangedPlayers()
         show()

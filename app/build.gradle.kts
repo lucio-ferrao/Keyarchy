@@ -14,8 +14,8 @@ android {
         applicationId = "org.ferrao.homekey"
         minSdk = 21
         targetSdk = 37
-        versionCode = 4301
-        versionName = "0.9"
+        versionCode = 4302
+        versionName = "0.10"
         ndk {
             abiFilters.clear()
             abiFilters.addAll(listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64"))
