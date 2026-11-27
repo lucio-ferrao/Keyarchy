@@ -15,8 +15,8 @@ import android.view.accessibility.AccessibilityWindowInfo
 /**
  * Accessibility service of the launcher mode: when a chat is opened from it, taps the message box so the keyboard
  * stays; taps the send button on Enter in apps that ignore Enter; reads the name of a chat the keyboard opens in, to
- * move that person forward in the list; tells the launcher mode about clicks in the app below, to leave it; and keeps
- * the app last in front, for the hide key of the home screen to go back to it. (The
+ * move that person forward in the list; tells the launcher mode about clicks in the app below, to leave it; keeps
+ * the app last in front, for the hide key of the home screen to go back to it; and draws the [NotificationIcons]. (The
  * name is kept from the screen
  * agent it was part of, so the service stays enabled.)
  */
@@ -78,12 +78,19 @@ class ScreenAgentService : AccessibilityService() {
         return visit(root, 0)
     }
 
+    /** the icons of the notifications with the screen off, while the service runs */
+    var notificationIcons: NotificationIcons? = null
+        private set
+
     override fun onServiceConnected() {
         instance = this
+        notificationIcons = NotificationIcons(this).also { it.start() }
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
         instance = null
+        notificationIcons?.stop()
+        notificationIcons = null
         return super.onUnbind(intent)
     }
 

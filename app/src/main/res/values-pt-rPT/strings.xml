@@ -22,6 +22,8 @@
     <string name="use_contacts_dict_summary">Usar nomes dos Contactos para sugestões e correções</string>
     <string name="voice_in_keyboard">Ditado dentro do teclado</string>
     <string name="voice_in_keyboard_summary">Toque longo na barra de espaços (ou a tecla de voz) para ditar com o reconhecimento de voz do sistema sem trocar de teclado. Toque no espaço para parar. Precisa da permissão do microfone.</string>
+    <string name="notification_icons">Notificações com o ecrã apagado</string>
+    <string name="notification_icons_summary">Com o ecrã apagado, o ecrã fica preto, com o ícone do Keyarchy sobre o sensor da impressão digital e os ícones a branco das apps que têm notificações não silenciosas no canto superior esquerdo, como na barra de estado. Precisa do serviço de acessibilidade do Keyarchy.</string>
     <string name="voice_in_keyboard_no_permission">O ditado precisa da permissão do microfone</string>
     <string name="voice_in_keyboard_error">Erro no ditado (%d)</string>
     <string name="use_personalized_dicts">"Sugestões personalizadas"</string>

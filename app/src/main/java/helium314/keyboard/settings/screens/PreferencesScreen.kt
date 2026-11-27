@@ -70,6 +70,7 @@ fun PreferencesScreen(
             Settings.PREF_KEYPRESS_SOUND_VOLUME else null,
         Settings.PREF_SAVE_SUBTYPE_PER_APP,
         Settings.PREF_VOICE_IN_KEYBOARD,
+        Settings.PREF_NOTIFICATION_ICONS,
         R.string.settings_category_additional_keys,
         Settings.PREF_SHOW_NUMBER_ROW,
         if (SubtypeSettings.getEnabledSubtypes(true).any { it.locale().language in localesWithLocalizedNumberRow })
@@ -151,6 +152,9 @@ fun createPreferencesSettings(context: Context) = listOf(
                 } else true
             }
         )
+    },
+    Setting(context, Settings.PREF_NOTIFICATION_ICONS, R.string.notification_icons, R.string.notification_icons_summary) {
+        SwitchPreference(it, Defaults.PREF_NOTIFICATION_ICONS)
     },
     Setting(context, Settings.PREF_SHOW_NUMBER_ROW, R.string.number_row, R.string.number_row_summary) {
         SwitchPreference(it, Defaults.PREF_SHOW_NUMBER_ROW) { KeyboardSwitcher.getInstance().setThemeNeedsReload() }

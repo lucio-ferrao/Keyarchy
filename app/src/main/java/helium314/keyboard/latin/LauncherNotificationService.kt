@@ -63,6 +63,7 @@ class LauncherNotificationService : NotificationListenerService() {
 
     override fun onListenerConnected() {
         instance = this
+        ScreenAgentService.instance?.notificationIcons?.update()
     }
 
     override fun onListenerDisconnected() {
@@ -78,10 +79,12 @@ class LauncherNotificationService : NotificationListenerService() {
         val ranking = try { currentRanking } catch (e: Exception) { null }
         entries.firstOrNull { it.key == sbn?.key }?.takeIf { sbn != null && isLoud(sbn, ranking) }
             ?.let { entry -> onPosted?.invoke(entry) }
+        ScreenAgentService.instance?.notificationIcons?.update()
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification?) {
         onChange?.invoke()
+        ScreenAgentService.instance?.notificationIcons?.update()
     }
 
     companion object {
@@ -127,6 +130,14 @@ class LauncherNotificationService : NotificationListenerService() {
                 Entry(sbn.key, sbn.packageName, title, text, sbn.postTime,
                     extras.getBoolean(Notification.EXTRA_IS_GROUP_CONVERSATION), sbn.notification)
             }.filter { it.title.isNotBlank() || it.text.isNotBlank() }.sortedByDescending { it.time }
+        }
+
+        /** the notifications in the status bar that are neither ongoing nor silent, newest first, for the [NotificationIcons] */
+        fun loud(): List<StatusBarNotification> {
+            val service = instance ?: return emptyList()
+            val notifications = try { service.activeNotifications } catch (e: Exception) { null } ?: return emptyList()
+            val ranking = try { service.currentRanking } catch (e: Exception) { null }
+            return notifications.filter { isShown(it) && isLoud(it, ranking) }.sortedByDescending { it.postTime }
         }
 
         /** neither ongoing nor silent */

@@ -96,6 +96,8 @@
     <string name="voice_in_keyboard">Voice input inside the keyboard</string>
     <!-- Description for the option to dictate inside the keyboard -->
     <string name="voice_in_keyboard_summary">Long press the space bar (or use the voice key) to dictate with the system speech recognition without switching to another keyboard. Tap the space bar to stop. Needs the microphone permission.</string>
+    <string name="notification_icons">Notifications with the screen off</string>
+    <string name="notification_icons_summary">With the screen off, a black screen with the icon of Keyarchy on the fingerprint sensor and the white icons of the apps that have a notification that is not silent at the top left, as in the status bar. Needs the accessibility service of Keyarchy.</string>
     <!-- Shown on the space bar while dictating -->
     <!-- Shown when dictation fails because the microphone permission is missing -->
     <string name="voice_in_keyboard_no_permission">Voice input needs the microphone permission</string>
