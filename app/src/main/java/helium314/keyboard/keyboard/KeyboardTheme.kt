@@ -110,7 +110,6 @@ private constructor(val themeId: Int, @JvmField val mStyleId: Int) {
         const val COLOR_KEYS = "keys"
         const val COLOR_FUNCTIONAL_KEYS = "functional_keys"
         const val COLOR_SPACEBAR = "spacebar"
-        const val COLOR_SPACEBAR_TEXT = "spacebar_text"
         const val COLOR_BACKGROUND = "background"
 
         @JvmStatic
@@ -187,7 +186,6 @@ private constructor(val themeId: Int, @JvmField val mStyleId: Int) {
                     Color.WHITE,
                     "#282828".toColorInt(),
                     Color.WHITE,
-                    "#80FFFFFF".toColorInt(),
                     keyboardBackground = backgroundImage
                 )
                 THEME_DARKER -> DefaultColors(
@@ -360,7 +358,6 @@ private constructor(val themeId: Int, @JvmField val mStyleId: Int) {
                 determineUserColor(colorSettings, context, COLOR_TEXT, isNight),
                 determineUserColor(colorSettings, context, COLOR_HINT_TEXT, isNight),
                 determineUserColor(colorSettings, context, COLOR_SUGGESTION_TEXT, isNight),
-                determineUserColor(colorSettings, context, COLOR_SPACEBAR_TEXT, isNight),
                 determineUserColor(colorSettings, context, COLOR_GESTURE, isNight),
                 backgroundImage,
             )
@@ -507,15 +504,6 @@ private constructor(val themeId: Int, @JvmField val mStyleId: Int) {
                 COLOR_FUNCTIONAL_KEYS ->
                     return brightenOrDarken(determineUserColor(colors, context, COLOR_KEYS, isNight), true)
                 COLOR_SPACEBAR -> return determineUserColor(colors, context, COLOR_KEYS, isNight)
-                COLOR_SPACEBAR_TEXT -> {
-                    val spacebar = determineUserColor(colors, context, COLOR_SPACEBAR, isNight)
-                    val hintText = determineUserColor(colors, context, COLOR_HINT_TEXT, isNight)
-                    if (isGoodContrast(hintText, spacebar)) return hintText and -0x7f000001 // add some transparency
-                    val text = determineUserColor(colors, context, COLOR_TEXT, isNight)
-                    if (isGoodContrast(text, spacebar)) return text and -0x7f000001
-                    return if (isBrightColor(spacebar)) Color.BLACK and -0x7f000001
-                    else Color.WHITE and -0x7f000001
-                }
                 COLOR_BACKGROUND -> return ContextCompat.getColor(
                     Settings.getDayNightContext(context, isNight),
                     R.color.keyboard_background

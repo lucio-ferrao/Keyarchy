@@ -128,7 +128,6 @@
     <string name="select_color_key_background">Фон клавіш</string>
     <string name="select_color_functional_key_background">Фон функціональних клавіш</string>
     <string name="select_color_spacebar_background">Фон пробілу</string>
-    <string name="select_color_spacebar_text">Текст пробілу</string>
     <string name="select_color_accent">Акцент</string>
     <string name="settings_screen_about">Довідка</string>
     <string name="version">Версія</string>
@@ -330,7 +329,6 @@
     <string name="gesture_floating_preview_static_summary">Показувати пропозицію під час вводу жестами</string>
     <string name="gesture_floating_preview_dynamic_summary">Переміщувати передперегляд під час вводу жестами</string>
     <string name="gesture_trail_fadeout_duration">Тривалість сліду жесту</string>
-    <string name="prefs_space_bar_text">Свій текст на клавіші пробілу</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Ряд буфера обміну внизу</string>
     <string name="label_enter_key" tools:keep="@string/label_enter_key">Enter</string>
     <string name="label_tab_key" tools:keep="@string/label_tab_key">Tab</string>

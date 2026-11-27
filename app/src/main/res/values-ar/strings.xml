@@ -161,7 +161,6 @@
     <string name="select_color_gesture">إدخال الإيماءة</string>
     <string name="save_log">احفظ السجلّ</string>
     <string name="license">رخصة مفتوحة المصدر</string>
-    <string name="select_color_spacebar_text">نص زر المسافة البيضاء</string>
     <string name="about_github_link">الرابط إلى جت هب</string>
     <string name="backup_restore_title">النسخ الاحتياطي والإسترجاع</string>
     <string name="user_dict_settings_add_weight_value">الوزن:</string>
@@ -338,7 +337,6 @@
     <string name="gesture_floating_preview_static">معاينة عائمة</string>
     <string name="icon_style">نمط الأيقونة</string>
     <string name="layout_number_row" tools:keep="@string/layout_number_row">صف الأرقام</string>
-    <string name="prefs_space_bar_text">نص مخصص على شريط المسافة</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">الصف السفلي للحافظة</string>
     <string name="label_tab_key" tools:keep="@string/label_tab_key">تبويب</string>
     <string name="label_delete_key" tools:keep="@string/label_delete_key">احذف</string>

@@ -271,7 +271,6 @@
     <string name="select_color_key_background">Teklaren atzeko planoa</string>
     <string name="select_color_functional_key_background">Funtzio-teklaren atzeko planoa</string>
     <string name="select_color_spacebar_background">Zuriune-teklaren atzeko planoa</string>
-    <string name="select_color_spacebar_text">Zuriune-teklaren testua</string>
     <string name="select_color_accent">Azentua</string>
     <string name="select_color_gesture">Keinu-sarrera</string>
     <string name="settings_screen_about">Honi buruz</string>
@@ -338,7 +337,6 @@
     <string name="remove_redundant_popups">Kendu popup erredundanteak</string>
     <string name="remove_redundant_popups_summary">Kendu oinarrizko diseinuan dauden popup teklak</string>
     <string name="space_swipe_toggle_numpad_entry">Aktibatu/desaktibatu zenbaki-teklatua</string>
-    <string name="prefs_space_bar_text">Testu pertsonalizatua zuriune-barran</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Arbelaren beheko errenkada</string>
     <string name="layout_number_row" tools:keep="@string/layout_number_row">Zenbakien errenkada</string>
     <string name="icon_style">Ikonoen estiloa</string>

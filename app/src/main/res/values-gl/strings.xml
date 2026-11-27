@@ -139,7 +139,6 @@
     <string name="select_color_suggestion">Texto da suxestión</string>
     <string name="select_color_key_background">Fondo da tecla</string>
     <string name="select_color_spacebar_background">Fondo da barra de espazo</string>
-    <string name="select_color_spacebar_text">Texto da barra de espazo</string>
     <string name="select_color_accent">Destacado</string>
     <string name="select_color_gesture">Entrada do xesto</string>
     <string name="settings_screen_about">Acerca de</string>
@@ -337,7 +336,6 @@
     <string name="gesture_floating_preview_static">Vista previa aboiando</string>
     <string name="layout_number_row" tools:keep="@string/layout_number_row">Número de fila</string>
     <string name="icon_style">Estilo da icona</string>
-    <string name="prefs_space_bar_text">Texto persoal na barra de espazo</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Liña inferior de portapapeis</string>
     <string name="label_tab_key" tools:keep="@string/label_tab_key">Tab</string>
     <string name="label_delete_key" tools:keep="@string/label_delete_key">Eliminar</string>

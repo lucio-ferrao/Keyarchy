@@ -156,7 +156,6 @@
     <string name="down" tools:keep="@string/down">Ned</string>
     <string name="layout_symbols" tools:keep="@string/layout_symbols">Symboler</string>
     <string name="theme_name_dark" tools:keep="@string/theme_name_dark">Mørk</string>
-    <string name="prefs_space_bar_text">Brugerdefineret tekst på mellemrumstast</string>
     <string name="layout_functional_keys" tools:keep="@string/layout_functional_keys">Funktionelle taster</string>
     <string name="dictionary_file_wrong_script">Fejl: Scriptet er ikke kompatibelt med dette tastatur</string>
     <string name="customize_currencies">Tilpas valutaer</string>

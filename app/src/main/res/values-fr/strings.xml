@@ -220,7 +220,6 @@ Nouveau dictionnaire:
     <string name="select_color_key_background">Arrière-plan des touches</string>
     <string name="select_color_functional_key_background">Arrière-plan des touches fonctionnelles</string>
     <string name="select_color_spacebar_background">Arrière-plan de la barre d\'espace</string>
-    <string name="select_color_spacebar_text">Texte de la barre d\'espace</string>
     <string name="select_color_accent">Couleur d\'accentuation</string>
     <string name="select_color_gesture">Saisie gestuelle</string>
     <string name="settings_screen_about">À propos</string>
@@ -334,7 +333,6 @@ Nouveau dictionnaire:
     <string name="gesture_trail_fadeout_duration">Durée du tracé du geste</string>
     <string name="icon_style">Style de l\'icône</string>
     <string name="layout_number_row" tools:keep="@string/layout_number_row">Rangée de chiffres</string>
-    <string name="prefs_space_bar_text">Texte personnalisé sur la barre d\'espace</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Rangée inférieure du presse-papier</string>
     <string name="label_tab_key" tools:keep="@string/label_tab_key">Tabulation</string>
     <string name="label_delete_key" tools:keep="@string/label_delete_key">Supprimer</string>

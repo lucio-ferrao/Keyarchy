@@ -8,13 +8,16 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Color
 import android.graphics.PixelFormat
+import android.graphics.Typeface
 import android.os.Build
 import android.os.PowerManager
+import android.util.TypedValue
 import android.view.Gravity
 import android.view.WindowManager
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.TextClock
 import helium314.keyboard.latin.settings.Defaults
 import helium314.keyboard.latin.settings.Settings
 import helium314.keyboard.latin.utils.Log
@@ -23,12 +26,13 @@ import kotlin.math.roundToInt
 import kotlin.random.Random
 
 /**
- * Notifications with the screen off, in place of the LED of old phones: while the screen is off, a black field over
- * the whole always-on display, hiding the clock of the system, with the icon of Keyarchy on the fingerprint sensor
- * and the white icons of the apps that have a notification neither silent nor ongoing where they are in the status
- * bar, at the top left. No wake lock and no animation; the icons of the apps a few pixels elsewhere at each screen
- * off, against burn-in. Turned on in the settings ("Notifications with the screen off"); needs the accessibility
- * service, whose window type draws over the lock screen.
+ * Notifications with the screen off, in place of the LED of old phones: while the screen is off, a black field over the
+ * whole always-on display, hiding the clock and the date of the system, with a clock of its own (hours over minutes, in
+ * grey, no date) where the clock of the system is, the icon of Keyarchy on the fingerprint sensor and the white icons
+ * of the apps that have a notification neither silent nor ongoing where they are in the status bar, at the top left. No
+ * wake lock and no animation (the clock changes with the minute ticks of the system); the clock and the icons of the
+ * apps a few pixels elsewhere at each screen off, against burn-in. Turned on in the settings ("Notifications with the
+ * screen off"); needs the accessibility service, whose window type draws over the lock screen.
  */
 class NotificationIcons(private val service: AccessibilityService) {
     private val windowManager = service.getSystemService(WindowManager::class.java)
@@ -84,8 +88,21 @@ class NotificationIcons(private val service: AccessibilityService) {
             setImageResource(R.drawable.ic_launcher_monochrome)
             setColorFilter(LOGO_COLOR)
         }
+        val clock = TextClock(service).apply {
+            // the hours over the minutes, in thin figures
+            format12Hour = "hh\nmm"
+            format24Hour = "HH\nmm"
+            gravity = Gravity.CENTER_HORIZONTAL
+            setTextSize(TypedValue.COMPLEX_UNIT_DIP, CLOCK_TEXT_DP)
+            setLineSpacing(0f, CLOCK_LINE_SPACING)
+            typeface = Typeface.create("sans-serif-thin", Typeface.NORMAL)
+            includeFontPadding = false
+            setTextColor(LOGO_COLOR)
+        }
         val view = FrameLayout(service).apply {
             setBackgroundColor(Color.BLACK)
+            addView(clock, FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.TOP or Gravity.CENTER_HORIZONTAL).apply { topMargin = dp(CLOCK_TOP_DP) })
             addView(row, FrameLayout.LayoutParams(FrameLayout.LayoutParams.WRAP_CONTENT, dp(ICON_DP), Gravity.TOP or Gravity.START)
                 .apply { marginStart = dp(START_DP); topMargin = dp(ICONS_CENTER_DP) - dp(ICON_DP) / 2 })
             addView(logo, FrameLayout.LayoutParams((LOGO_DP * density).roundToInt(), (LOGO_DP * density).roundToInt(),
@@ -94,6 +111,8 @@ class NotificationIcons(private val service: AccessibilityService) {
         // the icon of Keyarchy stays put, on the sensor
         row.translationX = shift()
         row.translationY = shift()
+        clock.translationX = shift()
+        clock.translationY = shift()
         val params = WindowManager.LayoutParams(metrics.bounds.width(), metrics.bounds.height(),
             WindowManager.LayoutParams.TYPE_ACCESSIBILITY_OVERLAY,
             WindowManager.LayoutParams.FLAG_NOT_FOCUSABLE or WindowManager.LayoutParams.FLAG_NOT_TOUCHABLE
@@ -142,8 +161,13 @@ class NotificationIcons(private val service: AccessibilityService) {
          * thirds as wide as the sensor
          */
         private const val LOGO_DP = SENSOR_DP * 1.6f
-        /** a discreet grey */
+        /** a discreet grey, also of the clock */
         private const val LOGO_COLOR = 0xFF808080.toInt()
+        /** the clock where the system has its clock and date on the Pixel 8 Pro (425 to 604 pixels from the top) */
+        private const val CLOCK_TOP_DP = 142
+        private const val CLOCK_TEXT_DP = 120f
+        /** the two lines of the clock close together */
+        private const val CLOCK_LINE_SPACING = 0.85f
         /** the most it moves each time, in each direction */
         private const val SHIFT_DP = 3
     }

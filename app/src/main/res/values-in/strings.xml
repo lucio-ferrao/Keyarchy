@@ -282,7 +282,6 @@
     <string name="hidden_features_title">Penjelasan tentang fitur-fitur tersembunyi</string>
     <string name="hidden_features_text">penyimpanan yang dilindungi perangkat</string>
     <string name="select_color_spacebar_background">Warna latar belakang tombol spasi</string>
-    <string name="select_color_spacebar_text">Warna teks tombol spasi</string>
     <string name="hidden_features_summary">Tampilkan fitur yang mungkin luput dari perhatian</string>
     <string name="show_horizontal_space_swipe">Gerakan geser bilah spasi horizontal</string>
     <string name="show_vertical_space_swipe">Gerakan geser bilah spasi vertikal</string>
@@ -301,7 +300,6 @@
     <string name="gesture_floating_preview_static_summary">Lihat kata yang disarankan sambil memberi isyarat</string>
     <string name="gesture_floating_preview_dynamic_summary">Pindahkan pratinjau selama gerakan</string>
     <string name="gesture_trail_fadeout_duration">Umur jejak gerakan</string>
-    <string name="prefs_space_bar_text">Teks khusus pada bilah spasi</string>
     <string name="layout_number_row" tools:keep="@string/layout_number_row">Baris nomor</string>
     <string name="customize_currencies">Sesuaikan mata uang</string>
     <string name="toast_msg_clipboard_copy">Konten disalin</string>

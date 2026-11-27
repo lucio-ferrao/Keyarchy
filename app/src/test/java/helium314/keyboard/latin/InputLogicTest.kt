@@ -558,13 +558,6 @@ class InputLogicTest {
         assertEquals("\"this i", text)
     }
 
-    @Test fun `double space takes back the first space and opens the launcher mode`() {
-        chainInput("hello")
-        input(' ')
-        input(' ')
-        assertEquals("hello", text)
-    }
-
     @Test fun `no weird space inside multi-"`() {
         chainInput("\"\"\"")
         assertEquals("\"\"\"", text)

@@ -279,7 +279,6 @@
     <string name="select_color_key_background">Fundal taste</string>
     <string name="select_color_functional_key_background">Fundal tastă funcțională</string>
     <string name="select_color_spacebar_background">Fundal bară de spațiu</string>
-    <string name="select_color_spacebar_text">Text bară de spațiu</string>
     <string name="about_github_link">Vezi pe GitHub</string>
     <string name="save_log">Salvează jurnalul</string>
     <string name="license">Licență open-source</string>
@@ -288,7 +287,6 @@
     <string name="space_swipe_move_cursor_entry">Mută cursorul</string>
     <string name="subtype_generic_student">%s (Student)</string>
     <string name="gesture_fast_typing_cooldown_instant">Începe întotdeauna instantaneu</string>
-    <string name="prefs_space_bar_text">Text personalizat pe bara de spațiu</string>
     <string name="customize_currencies">Personalizează monedele</string>
     <string name="customize_currencies_detail">Setează simboluri valutare principale și până la 6 secundare, separate prin spațiu</string>
     <string name="settings_screen_toolbar">Bara de instrumente</string>

@@ -81,8 +81,8 @@ import kotlin.math.abs
 
 /**
  * Launcher mode: while active, typing searches the apps of all profiles visible to the keyboard instead of going
- * to the text field, and the results are shown in the suggestion strip. Toggled by a double tap on space or by the
- * apps toolbar key. Without a search text, the apps launched most often from here come first.
+ * to the text field, and the results are shown in the suggestion strip. Toggled by the Keyarchy icon at the left
+ * of the suggestion strip. Without a search text, the apps launched most often from here come first.
  */
 class AppLauncherMode(private val context: Context) : StripSearch {
     /** the keyboard the mode runs in; null for the own mode of the home screen when another keyboard is used */
@@ -97,8 +97,6 @@ class AppLauncherMode(private val context: Context) : StripSearch {
     private var dismissedRecent = mutableMapOf<String, Long>()
     /** the result chosen last for each search text, which comes first the next time that text is typed */
     private var choices = mutableMapOf<String, String>()
-    private var lastSpaceTapTime = 0L
-    private var startTime = 0L
     private var listening = false
     /** a message shown instead of the results (listening, not understood…), until the next key */
     private var message: String? = null
@@ -219,7 +217,6 @@ class AppLauncherMode(private val context: Context) : StripSearch {
 
     fun start() {
         isActive = true
-        startTime = SystemClock.uptimeMillis()
         // a tap on a button or element of the app (seen by the accessibility service) leaves the mode
         ScreenAgentService.onTapInOtherApp = { onTapOutside() }
         ScreenAgentService.onEscape = { leave() }
@@ -236,7 +233,6 @@ class AppLauncherMode(private val context: Context) : StripSearch {
             HomeActivity.stopEditing()
             query.append(HomeActivity.fieldText())
         }
-        lastSpaceTapTime = 0
         counts = readCounts(context)
         lastUsed = readTimes(context, PREF_LAST_USED)
         // a dismissal ends when the entry is opened again (or a message of the person comes) after it
@@ -293,13 +289,10 @@ class AppLauncherMode(private val context: Context) : StripSearch {
         results = emptyList()
     }
 
-    /**
-     * A tap outside the keyboard, in the app below: leaves the mode. Ignored just after starting, because the double tap
-     * on space that starts it takes back a space from the text field, which moves the cursor.
-     */
+    /** A tap outside the keyboard, in the app below: leaves the mode. */
     override fun onTapOutside() {
         // not on the home screen: there the system's text menu (Paste) counts as a click in another app
-        if (capturesInput() && SystemClock.uptimeMillis() - startTime > 600) stop()
+        if (capturesInput()) stop()
     }
 
     /** handles a key while the mode is active, returns false for keys that should be handled normally (e.g. shift) */
@@ -308,18 +301,11 @@ class AppLauncherMode(private val context: Context) : StripSearch {
         actionsFor = null
         val codePoint = event.codePoint
         if (codePoint == Constants.CODE_SPACE && !event.isKeyRepeat) {
-            val now = SystemClock.uptimeMillis()
-            if (now - lastSpaceTapTime < ViewConfiguration.getDoubleTapTimeout()) {
-                stop()
-                return true
-            }
-            lastSpaceTapTime = now
             message = null
             query.append(' ')
             show()
             return true
         }
-        lastSpaceTapTime = 0
         message = null
         when {
             codePoint == Constants.CODE_ENTER -> {
@@ -342,7 +328,6 @@ class AppLauncherMode(private val context: Context) : StripSearch {
 
     override fun onTextInput(text: String) {
         stopListening()
-        lastSpaceTapTime = 0
         message = null
         query.append(text)
         show()

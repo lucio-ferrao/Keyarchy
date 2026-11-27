@@ -185,7 +185,6 @@
     <string name="localized_number_row_summary">Lokalisierte Ziffern gegenüber lateinischen bevorzugen</string>
     <string name="checksum_mismatch_message">Unbekannte Bibliotheksdatei. Wurde sie aus einer vertrauenswürdigen Quelle bezogen und ist sie für „%s“ bestimmt?</string>
     <string name="theme_name_blue_gray" tools:keep="@string/theme_name_blue_gray">Blaugrau</string>
-    <string name="select_color_spacebar_text">Leertastenbeschriftung</string>
     <string name="theme_name_light" tools:keep="@string/theme_name_light">Hell</string>
     <string name="user_dict_add_word_button">Wort hinzufügen</string>
     <string name="select_color_suggestion">Textfarbe Wortvorschlag</string>
@@ -327,7 +326,6 @@
     <string name="gesture_floating_preview_static_summary">Das vorgeschlagene Wort während der Geste anzeigen</string>
     <string name="gesture_floating_preview_dynamic_summary">Die Vorschau während einer Geste mitbewegen</string>
     <string name="gesture_trail_fadeout_duration">Anzeigedauer der Gestenspur</string>
-    <string name="prefs_space_bar_text">Benutzerdefinierter Text auf der Leertaste</string>
     <string name="layout_number_row" tools:keep="@string/layout_number_row">Ziffernzeile</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Untere Zwischenablage-Zeile</string>
     <string name="icon_style">Symbolstil</string>

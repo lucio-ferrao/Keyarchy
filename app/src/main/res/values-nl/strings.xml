@@ -274,7 +274,6 @@
     <string name="select_color_key">Toetstekst</string>
     <string name="select_color_key_background">Toets-achtergrond</string>
     <string name="select_color_spacebar_background">Spatiebalk-achtergrond</string>
-    <string name="select_color_spacebar_text">Spatiebalk-tekst</string>
     <string name="select_color_accent">Accent</string>
     <string name="gnu_gpl">GNU General Public License v3.0</string>
     <string name="dialog_close">Sluiten</string>
@@ -338,7 +337,6 @@
     <string name="gesture_floating_preview_static_summary">Zie het voorgestelde woord tijdens het gebaar</string>
     <string name="icon_style">Pictogramstijl</string>
     <string name="layout_number_row" tools:keep="@string/layout_number_row">Cijferregel</string>
-    <string name="prefs_space_bar_text">Aangepaste tekst op spatiebalk</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Klembord onderste regel</string>
     <string name="label_enter_key" tools:keep="@string/label_enter_key">Enter</string>
     <string name="label_tab_key" tools:keep="@string/label_tab_key">Tab</string>

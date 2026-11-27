@@ -167,7 +167,6 @@
     <string name="full_left" tools:keep="@string/full_left">Tot a l\'esquerra</string>
     <string name="full_right" tools:keep="@string/full_right">Tot a la dreta</string>
     <string name="emoji" tools:keep="@string/emoji">Emojis</string>
-    <string name="prefs_space_bar_text">Text personalitzat a la barra espaiadora</string>
     <string name="customize_currencies">Personalitza divises</string>
     <string name="customize_currencies_detail">Estableix símbols de moneda principal i fins a 6 secundaris, separats per espai</string>
     <string name="localized_number_row_summary">Prefereix els localitzats als nombres llatins</string>
@@ -291,7 +290,6 @@
     <string name="version">Versió</string>
     <string name="about_github_link">Veure a GitHub</string>
     <string name="save_log">Desa el registre</string>
-    <string name="select_color_spacebar_text">Text de la barra espaiadora</string>
     <string name="select_color_accent">Accent</string>
     <string name="select_color_gesture">Entrada gestual</string>
     <string name="settings_screen_appearance">Aparença</string>

@@ -265,7 +265,6 @@
     <string name="hidden_features_title">Beskrivelse av skjulte funksjoner</string>
     <string name="theme_name_cloudy" tools:keep="@string/theme_name_cloudy">Skyet</string>
     <string name="select_color_spacebar_background">Bakgrunn for mellomromstasten</string>
-    <string name="select_color_spacebar_text">Tekst på mellomromstasten</string>
     <string name="hidden_features_summary">Vis funksjoner som kan gå ubemerket hen</string>
     <string name="show_horizontal_space_swipe">Horisontal sveipebevegelse for mellomromstasten</string>
     <string name="show_vertical_space_swipe">Vertikal sveipebevegelse for mellomromstasten</string>
@@ -354,7 +353,6 @@
     <string name="prefs_bottom_row_scale">Skalering av nederste rad</string>
     <string name="prefs_side_padding_scale">Skalering av sideutfylling</string>
     <string name="prefs_font_scale">Skriftstørrelse for tastatur</string>
-    <string name="prefs_space_bar_text">Tilpasset tekst på mellomromstasten</string>
     <string name="custom_font">Angi tilpasset skrifttype fra fil</string>
     <string name="custom_emoji_font">Angi tilpasset emoji-skrifttype fra fil</string>
     <string name="subtype_mns">Mansi</string>

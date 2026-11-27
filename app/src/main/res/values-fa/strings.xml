@@ -255,7 +255,6 @@
     <string name="prefs_bottom_row_scale">ارتفاع ردیف پایین</string>
     <string name="prefs_side_padding_scale">حاشیه کناری</string>
     <string name="prefs_font_scale">اندازه قلم صفحه‌کلید</string>
-    <string name="prefs_space_bar_text">متن دلخواه روی کلید فاصله</string>
     <string name="custom_font">تنظیم قلم دلخواه از فایل</string>
     <string name="custom_emoji_font">تنظیم قلم دلخواه ایموجی از فایل</string>
     <string name="subtype_mns">مانسی</string>
@@ -369,7 +368,6 @@
     <string name="select_color_key_background">پس‌زمینه کلید</string>
     <string name="select_color_functional_key_background">پس‌زمینه کلید عملکردی</string>
     <string name="select_color_spacebar_background">پس‌زمینه کلید فاصله</string>
-    <string name="select_color_spacebar_text">متن کلید فاصله</string>
     <string name="select_color_accent">رنگ برجسته (Accent)</string>
     <string name="select_color_gesture">ورودی اشاره‌ای</string>
     <string name="get_colors_message">می‌توانید رنگ‌ها را در %s پیدا کرده و به اشتراک بگذارید.</string>

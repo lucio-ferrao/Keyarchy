@@ -220,7 +220,6 @@
     <string name="no_dictionary_message">"Nếu không có từ điển, bạn sẽ chỉ thấy gợi ý cho chữ mà bạn đã nhập trước đó.&lt;br&gt;\n        Bạn có thể tải từ điển %1$s, hoặc kiểm tra từ điển \"%2$s\" được tải trực tiếp %3$s."</string>
     <string name="add_to_personal_dictionary_summary">Sử dụng từ điển cá nhân trên thiết bị để lưu trữ từ</string>
     <string name="backup_restored">Khôi phục dữ liệu đã lưu trữ thành công</string>
-    <string name="prefs_space_bar_text">Tuỳ chỉnh chữ cho phím khoảng cách</string>
     <string name="suggest_emojis_summary">Sử dụng từ điển biểu tượng cảm xúc trong chế độ gợi ý thường</string>
     <string name="center_suggestion_text_to_enter_summary">Khi nhấn giữ phím khoảng cách hoặc dấu câu, gợi ý ở giữa sẽ được nhập vào</string>
 </resources>

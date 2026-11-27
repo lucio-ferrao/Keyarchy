@@ -1437,12 +1437,6 @@ public class LatinIME extends InputMethodService implements
             mKeyboardSwitcher.onEvent(event, Constants.TextUtils.CAP_MODE_OFF, null);
             return;
         }
-        // double tap on space enters the launcher mode; on the home screen of Keyarchy, whose text field is the search,
-        // spaces are just typed
-        if (!HomeActivity.Companion.isHomeField(getCurrentInputEditorInfo()) && mInputLogic.takeBackSpaceOnDoubleTap(event)) {
-            mAppLauncher.start();
-            return;
-        }
         InputTransaction completeInputTransaction =
                 mInputLogic.onCodeInput(mSettings.getCurrent(), event, mKeyboardSwitcher.getKeyboardCapsMode(), mHandler);
         updateStateAfterInputTransaction(completeInputTransaction);
@@ -1703,10 +1697,9 @@ public class LatinIME extends InputMethodService implements
         showVoiceListening(false);
     }
 
-    /** voice input listening (dictation or the launcher mode): the microphone on the space bar is drawn bright */
+    /** voice input listening (dictation or the launcher mode): the microphone of the suggestion strip shows it */
     void showVoiceListening(final boolean listening) {
-        final MainKeyboardView view = mKeyboardSwitcher.getMainKeyboardView();
-        if (view != null) view.setVoiceListening(listening);
+        if (hasSuggestionStripView()) mSuggestionStripView.setVoiceListening(listening);
     }
 
     void onVoiceDictationSend() {

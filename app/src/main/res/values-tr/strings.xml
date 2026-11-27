@@ -205,7 +205,6 @@
     <string name="theme_navbar">Renkli gezinme çubuğu</string>
     <string name="theme_name_user" tools:keep="@string/theme_name_user">Kullanıcı tanımlı</string>
     <string name="select_color_spacebar_background">Boşluk çubuğu arka planı</string>
-    <string name="select_color_spacebar_text">Boşluk çubuğu metni</string>
     <string name="select_color_gesture">Hareketli giriş</string>
     <string name="replace_dictionary_message">Kullanıcı tarafından eklenen \"%1$s\" sözlüğü değiştirilsin mi?
 \n
@@ -338,7 +337,6 @@
 \n        %1$s sözlüklerini indirebilir veya \"%2$s\" için bir sözlüğün doğrudan %3$s indirilip indirilemeyeceğini kontrol edebilirsin."</string>
     <string name="layout_number_row" tools:keep="@string/layout_number_row">Sayı satırı</string>
     <string name="icon_style">Simge stili</string>
-    <string name="prefs_space_bar_text">Boşluk çubuğu özel metni</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Pano alt satırı</string>
     <string name="label_enter_key" tools:keep="@string/label_enter_key">Giriș</string>
     <string name="label_tab_key" tools:keep="@string/label_tab_key">Sekme</string>

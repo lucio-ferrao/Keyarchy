@@ -294,7 +294,6 @@
     <string name="select_color_key_background">Tangentbakgrund</string>
     <string name="select_color_functional_key_background">Bakgrund för funktionstangenter</string>
     <string name="select_color_spacebar_background">Bakgrund för blankstegstangent</string>
-    <string name="select_color_spacebar_text">Text på blankstegstangent</string>
     <string name="select_color_accent">Accent</string>
     <string name="select_color_gesture">Gestinmatning</string>
     <string name="hidden_features_text">enhetsskyddad lagring</string>
@@ -336,7 +335,6 @@
     <string name="gesture_trail_fadeout_duration">Visningstid för gestspår</string>
     <string name="icon_style">Ikonstil</string>
     <string name="layout_number_row" tools:keep="@string/layout_number_row">Sifferrad</string>
-    <string name="prefs_space_bar_text">Egen text på blankstegstangenten</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Urklippsvyns nedre rad</string>
     <string name="label_enter_key" tools:keep="@string/label_enter_key">Retur</string>
     <string name="label_tab_key" tools:keep="@string/label_tab_key">Tabb</string>

@@ -210,7 +210,6 @@
     <string name="toast_msg_clipboard_copy">Conteúdo copiado</string>
     <string name="label_switch_onehanded_key" tools:keep="@string/label_switch_onehanded_key">Mudar o lado do modo de uma mão</string>
     <string name="file_read_error">Não foi possível ler o ficheiro</string>
-    <string name="prefs_space_bar_text">Texto personalizado na barra de espaço</string>
     <string name="subtype_mns">Mansi</string>
     <string name="customize_currencies">Personalizar moedas</string>
     <string name="dictionary_file_wrong_script">Erro: escrita não compatível com este teclado</string>
@@ -314,7 +313,6 @@
     <string name="label_shift_key_shifted" tools:keep="@string/label_shift_key_shifted">Shift (ativado)</string>
     <string name="theme_name_forest" tools:keep="@string/theme_name_forest">Foresta</string>
     <string name="user_dict_word_already_present">Esta palavra já está presente no dicionário do utilizador %s. Digite outra.</string>
-    <string name="select_color_spacebar_text">Texto da barra de espaço</string>
     <string name="delete_confirmation">Apagar mesmo %s?</string>
     <string name="button_load_custom">Carregar ficheiro</string>
     <string name="theme_name_user" tools:keep="@string/theme_name_user">Definido pelo utilizador</string>

@@ -108,6 +108,12 @@ class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int)
      * opens or closes the launcher mode, a long press goes to the home screen.
      */
     private val appsKey = findViewById<ImageButton>(R.id.suggestions_strip_apps_key)
+    /**
+     * The key on the right starts or stops voice input, as a long press on space does; the microphone is faint, and
+     * in full color while listening.
+     */
+    private val voiceKey = findViewById<ImageButton>(R.id.suggestions_strip_voice_key)
+    private var voiceListening = false
     private val incognitoIcon = KeyboardIconsSet.instance.getNewDrawable(ToolbarKey.INCOGNITO.name, context)
     private val keyarchyIcon = ContextCompat.getDrawable(context, R.drawable.ic_keyarchy_key)
     private var direction = 1 // 1 if LTR, -1 if RTL
@@ -131,6 +137,12 @@ class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int)
         appsKey.layoutParams.width = keyHeight // we want it square
         colors.setBackground(appsKey, ColorType.STRIP_BACKGROUND)
         appsKey.setOnClickListener(this)
+        voiceKey.layoutParams.height = keyHeight
+        voiceKey.layoutParams.width = keyHeight
+        colors.setBackground(voiceKey, ColorType.STRIP_BACKGROUND)
+        voiceKey.setImageDrawable(KeyboardIconsSet.instance.getNewDrawable(ToolbarKey.VOICE.name, context))
+        colors.setColor(voiceKey, ColorType.TOOL_BAR_KEY)
+        voiceKey.setOnClickListener(this)
         // a long press goes to the home screen; the settings are an entry of the list of apps
         appsKey.setOnLongClickListener {
             context.startActivity(Intent(Intent.ACTION_MAIN).addCategory(Intent.CATEGORY_HOME).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
@@ -193,12 +205,14 @@ class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int)
     fun setEmojiMode(active: Boolean) {
         emojiMode = active
         updateAppsKey()
+        updateVoiceKey()
     }
 
     /** on the home screen of Keyarchy the launcher mode is always open, its search being the text field: no arrow */
     fun setOnHomeScreen(home: Boolean) {
         onHomeScreen = home
         updateAppsKey()
+        updateVoiceKey()
     }
 
     private fun updateAppsKey() {
@@ -207,6 +221,18 @@ class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int)
         appsKey.rotation = if (launcherMode) 90f * direction else 0f
         // no background of its own: just the icon on the strip, in the color of the strip's keys (tints the drawable)
         Settings.getValues().mColors.setColor(appsKey, ColorType.TOOL_BAR_KEY)
+    }
+
+    /** voice input started or stopped listening (dictation or the launcher mode) */
+    fun setVoiceListening(listening: Boolean) {
+        voiceListening = listening
+        updateVoiceKey()
+    }
+
+    /** only with voice input inside the keyboard, and not in the emoji mode, whose search would not get the text */
+    private fun updateVoiceKey() {
+        voiceKey.isVisible = Settings.getValues().mVoiceInKeyboard && !emojiMode
+        voiceKey.imageAlpha = if (voiceListening) 255 else VOICE_IDLE_ALPHA
     }
 
     fun setSuggestions(suggestions: SuggestedWords, isRtlLanguage: Boolean) {
@@ -298,6 +324,10 @@ class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int)
         AudioAndHapticFeedbackManager.getInstance().performHapticAndAudioFeedback(KeyCode.NOT_SPECIFIED, this, HapticEvent.KEY_PRESS)
         if (view === appsKey) {
             listener.onCodeInput(KeyCode.APP_SEARCH, Constants.SUGGESTION_STRIP_COORDINATE, Constants.SUGGESTION_STRIP_COORDINATE, false)
+            return
+        }
+        if (view === voiceKey) {
+            listener.onCodeInput(KeyCode.VOICE_INPUT, Constants.SUGGESTION_STRIP_COORDINATE, Constants.SUGGESTION_STRIP_COORDINATE, false)
             return
         }
 
@@ -439,6 +469,7 @@ class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int)
 
     private fun updateKeys() {
         updateAppsKey()
+        updateVoiceKey()
         isExternalSuggestionVisible = false
     }
 
@@ -446,6 +477,8 @@ class SuggestionStripView(context: Context, attrs: AttributeSet?, defStyle: Int)
         @JvmField
         var DEBUG_SUGGESTIONS = false
         private const val DEBUG_INFO_TEXT_SIZE_IN_DIP = 6.5f
+        /** the microphone while not listening: about 40% */
+        private const val VOICE_IDLE_ALPHA = 100
         private val TAG = SuggestionStripView::class.java.simpleName
     }
 }

@@ -263,7 +263,6 @@
     <string name="prefs_side_padding_scale">측면 행 크기</string>
     <string name="prefs_font_scale">키보드 글꼴 크기</string>
     <string name="prefs_hint_font_scale">키 힌트 글꼴 크기</string>
-    <string name="prefs_space_bar_text">스페이스바 글자 사용자 지정</string>
     <string name="custom_font">파일에서 글꼴 사용자 지정</string>
     <string name="custom_emoji_font">파일에서 이모지 글꼴 사용자 지정</string>
     <string name="subtype_generic_extended">%s (확장)</string>
@@ -345,7 +344,6 @@
     <string name="select_color_key">키 글자</string>
     <string name="select_color_key_hint">키 힌트 글자</string>
     <string name="select_color_suggestion">제안 글자</string>
-    <string name="select_color_spacebar_text">스페이스바 글자</string>
     <string name="select_color_accent">강조</string>
     <string name="select_color_gesture">제스처 입력</string>
     <string name="get_colors_message">%s에서 색상을 찾고 공유할 수 있습니다.</string>

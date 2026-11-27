@@ -312,7 +312,6 @@
     <string name="layout_number_row_basic" tools:keep="@string/layout_number_row_basic">Numerorivi (perus)</string>
     <string name="customize_background_image_landscape">Aseta taustakuva (vaakataso)</string>
     <string name="remove_dictionary_message">Haluatko varmasti poistaa käyttäjän lisäämän sanaston \"%s\"?</string>
-    <string name="select_color_spacebar_text">Välilyönnin teksti</string>
     <string name="about_wiki_link">Siirry wikiin</string>
     <string name="about_wiki_link_description">Kuka tahansa GitHub-käyttäjä voi parantaa wikiä!</string>
     <string name="space_swipe_hide_keyboard_entry">Piilota näppäimistö</string>

@@ -187,7 +187,6 @@
     <string name="close_history" tools:keep="@string/close_history">Затваряне на хронологията на клипборда</string>
     <string name="clipboard_toolbar_keys">Избиране на клавиши от лентата с инструменти за клипборд</string>
     <string name="layout_numpad" tools:keep="@string/layout_numpad">Цифрова клавиатура</string>
-    <string name="prefs_space_bar_text">Персонализиран текст в лентата за интервал</string>
     <string name="customize_currencies">Персонализиране на валути</string>
     <string name="day_or_night_day">Ден</string>
     <string name="layout_error">Грешка в оформлението: %s</string>
@@ -258,7 +257,6 @@
     <string name="space_swipe_toggle_numpad_entry">Превключване на цифровата клавиатура</string>
     <string name="select_color_gesture">Въвеждане с жестове</string>
     <string name="text_tap_languages">Докоснете езика, за да отворите настройките</string>
-    <string name="select_color_spacebar_text">Текст с интервал</string>
     <string name="dictionary_file_error">Грешка: Избраният файл не е валиден речников файл</string>
     <string name="theme_name_user" tools:keep="@string/theme_name_user">Дефиниран от потребителя</string>
     <string name="theme_name_dark" tools:keep="@string/theme_name_dark">Тъмна</string>

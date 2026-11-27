@@ -187,7 +187,6 @@
     <string name="select_color_key_background">Pozadí klávesy</string>
     <string name="select_color_functional_key_background">Pozadí funkční klávesy</string>
     <string name="select_color_spacebar_background">Pozadí mezerníku</string>
-    <string name="select_color_spacebar_text">Text mezerníku</string>
     <string name="action_none">Žádné</string>
     <string name="subtype_xdq">Kaitag</string>
     <string name="close_history" tools:keep="@string/close_history">Zavřít historii schránky</string>
@@ -340,7 +339,6 @@
     <string name="toast_msg_clipboard_copy">Obsah zkopírován</string>
     <string name="subtype_baishakhi_bn_IN">%s (Baishakhi)</string>
     <string name="label_stop_onehanded_mode_key" tools:keep="@string/label_stop_onehanded_mode_key">Ukončit režim jedné ruky</string>
-    <string name="prefs_space_bar_text">Vlastní text na mezerníku</string>
     <string name="more_colors">Zobrazit další barvy</string>
     <string name="load">Načíst</string>
     <string name="emoji" tools:keep="@string/emoji">Emodži</string>

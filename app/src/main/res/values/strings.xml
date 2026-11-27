@@ -472,8 +472,6 @@
     <string name="prefs_font_scale">Keyboard font scale</string>
     <!-- Title of the setting for adjusting font size of the long-press hints -->
     <string name="prefs_hint_font_scale">Key hint font scale</string>
-    <!-- Title of the setting for customizing space bar text -->
-    <string name="prefs_space_bar_text">Custom text on space bar</string>
     <!-- Title of the setting for adding / removing custom font file -->
     <string name="custom_font">Set custom font from file</string>
     <!-- Title of the setting for adding / removing custom font file used only for emojis -->
@@ -824,8 +822,6 @@ New dictionary:
     <string name="select_color_functional_key_background">Functional key background</string>
     <!-- Selection: space bar color. -->
     <string name="select_color_spacebar_background">Space bar background</string>
-    <!-- Selection: space bar text color. -->
-    <string name="select_color_spacebar_text">Space bar text</string>
     <!-- Selection: accent color. -->
     <string name="select_color_accent">Accent</string>
     <!-- Selection: gesture color. -->

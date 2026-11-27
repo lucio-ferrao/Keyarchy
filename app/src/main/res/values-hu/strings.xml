@@ -270,7 +270,6 @@
     <string name="select_color_suggestion">Javaslatsáv szövege</string>
     <string name="select_color_key_background">Billentyűháttér</string>
     <string name="select_color_spacebar_background">Szóközbillentyű háttere</string>
-    <string name="select_color_spacebar_text">Szóközbillentyű szövege</string>
     <string name="select_color_accent">Kiemelőszín</string>
     <string name="select_color_gesture">Kézmozdulat-gépelés</string>
     <string name="version">Verzió</string>
@@ -286,7 +285,6 @@
     <string name="popup_order_and_hint_source">Felugró billentyűk sorrendjének és tippek forrása</string>
     <string name="layout_functional_keys_symbols" tools:keep="@string/layout_functional_keys_symbols">Funkcióbillentyűk (Szimbólumok)</string>
     <string name="landscape">Fekvő</string>
-    <string name="prefs_space_bar_text">Egyéni szöveg a szóközbillentyűn</string>
     <string name="custom_subtype">Egyéni altípus</string>
     <string name="prefs_always_show_suggestions_except_web_text">Ne jelenítsen meg mindig javaslatokat a webes szerkesztőmezőkben</string>
     <string name="emoji" tools:keep="@string/emoji">Emodzsi</string>

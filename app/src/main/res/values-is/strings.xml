@@ -199,7 +199,6 @@
     <string name="key_code">Lykilkóði</string>
     <string name="delete_swipe">Stroka til að eyða</string>
     <string name="save_log">Vista atvikaskrá</string>
-    <string name="prefs_space_bar_text">Sérsniðinn texti á bilslá</string>
     <string name="key_borders">Jaðrar lykla</string>
     <string name="abbreviation_unit_minutes">%s mín</string>
     <string name="language_switch_key_behavior">Hegðun lykils til að breyta tungumáli</string>
@@ -281,7 +280,6 @@
     <string name="main_colors">Sýna einungis aðalliti</string>
     <string name="theme_name_chocolate" tools:keep="@string/theme_name_chocolate">Súkkulaði</string>
     <string name="select_color_key_hint">Ábendingartexti lykils</string>
-    <string name="select_color_spacebar_text">Texti bilslár</string>
     <string name="theme_name_forest" tools:keep="@string/theme_name_forest">Skógur</string>
     <string name="label_bin" tools:keep="@string/label_bin">Rusl</string>
     <string name="space_swipe_toggle_numpad_entry">Víxla talnaborði af/á</string>

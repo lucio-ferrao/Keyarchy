@@ -30,8 +30,6 @@
     <integer name="config_sliding_key_input_preview_shadow_ratio">-1</integer>
     <dimen name="config_key_hysteresis_distance_for_sliding_modifier">8.0dp</dimen>
 
-    <dimen name="config_language_on_spacebar_horizontal_margin">3dp</dimen>
-
     <integer name="config_gesture_trail_fadeout_start_delay">100</integer>
     <integer name="config_gesture_trail_update_interval">20</integer>
     <!-- Static threshold for gesture after fast typing (msec) -->

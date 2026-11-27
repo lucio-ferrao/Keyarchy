@@ -249,7 +249,6 @@
     <string name="layout_number_row" tools:keep="@string/layout_number_row">Linha de números</string>
     <string name="summary_customize_background_image_landscape">Se não definido, a imagem de retrato será usada</string>
     <string name="layout_phone" tools:keep="@string/layout_phone">Telefone</string>
-    <string name="prefs_space_bar_text">Texto personalizado na barra de espaço</string>
     <string name="custom_font">Definir fonte personalizada de ficheiro</string>
     <string name="subtype_mns">Mansi</string>
     <string name="subtype_dag">Dagbani</string>
@@ -345,7 +344,6 @@
     <string name="select_color_suggestion">Texto da linha de sugestões</string>
     <string name="select_color_key_background">Fundo da tecla</string>
     <string name="select_color_functional_key_background">Fundo da tecla funcional</string>
-    <string name="select_color_spacebar_text">Texto da barra de espaço</string>
     <string name="select_color_accent">Acento</string>
     <string name="select_color_gesture">Input gestual</string>
     <string name="get_layouts_message">Podes encontrar e partilhar layouts em %s.</string>

@@ -243,7 +243,6 @@
     <string name="prefs_bottom_padding_scale">கீழே திணிப்பு அளவு</string>
     <string name="prefs_side_padding_scale">பக்க திணிப்பு அளவுகோல்</string>
     <string name="prefs_font_scale">விசைப்பலகை எழுத்துரு அளவு</string>
-    <string name="prefs_space_bar_text">ச்பேச் பாரில் தனிப்பயன் உரை</string>
     <string name="custom_font">கோப்பிலிருந்து தனிப்பயன் எழுத்துருவை அமைக்கவும்</string>
     <string name="subtype_mns">மான்சி</string>
     <string name="subtype_xdq">காய்டாக்</string>
@@ -359,7 +358,6 @@
     <string name="select_color_key_background">முக்கிய பின்னணி</string>
     <string name="select_color_functional_key_background">செயல்பாட்டு விசை பின்னணி</string>
     <string name="select_color_spacebar_background">ச்பேச் பார் பின்னணி</string>
-    <string name="select_color_spacebar_text">ச்பேச் பார் உரை</string>
     <string name="select_color_accent">உச்சரிப்பு</string>
     <string name="select_color_gesture">சைகை உள்ளீடு</string>
     <string name="get_colors_message">நீங்கள் %s இல் வண்ணங்களைக் கண்டறிந்து பகிரலாம்.</string>

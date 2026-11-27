@@ -259,7 +259,6 @@
     <string name="prefs_side_padding_scale">Škála bočného vyplnenia</string>
     <string name="prefs_font_scale">Škála písma na klávesnici</string>
     <string name="prefs_hint_font_scale">Škála písma pre klávesu nápovedy</string>
-    <string name="prefs_space_bar_text">Vlastný text na medzerníku</string>
     <string name="custom_font">Nastaviť vlastné písmo zo súboru</string>
     <string name="custom_emoji_font">Nastaviť vlastné písmo emodži zo súboru</string>
     <string name="subtype_mns">Mansi</string>
@@ -379,7 +378,6 @@
     <string name="select_color_key_background">Pozadie klávesy</string>
     <string name="select_color_functional_key_background">Pozadie funkčných klávesov</string>
     <string name="select_color_spacebar_background">Pozadie medzerníka</string>
-    <string name="select_color_spacebar_text">Text na medzerníku</string>
     <string name="select_color_accent">Prízvuk</string>
     <string name="select_color_gesture">Zadávanie gestami</string>
     <string name="get_colors_message">V %s môžete vyhľadávať a zdieľať farby.</string>

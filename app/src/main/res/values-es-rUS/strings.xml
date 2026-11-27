@@ -261,7 +261,6 @@
     <string name="select_color_key_background">Fondo de la tecla</string>
     <string name="select_color_functional_key_background">Fondo de la tecla funcional</string>
     <string name="select_color_spacebar_background">Fondo de la barra espaciadora</string>
-    <string name="select_color_spacebar_text">Texto de la barra espaciadora</string>
     <string name="select_color_accent">Acento</string>
     <string name="select_color_gesture">Entrada gestual</string>
     <string name="settings_screen_about">Acerca de</string>
@@ -337,7 +336,6 @@
     <string name="gesture_floating_preview_dynamic_summary">Mover la vista previa durante los gestos</string>
     <string name="gesture_trail_fadeout_duration">Duración del rastro gestual</string>
     <string name="layout_number_row" tools:keep="@string/layout_number_row">Fila numérica</string>
-    <string name="prefs_space_bar_text">Texto personalizado en la barra espaciadora</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Fila inferior del portapapeles</string>
     <string name="label_tab_key" tools:keep="@string/label_tab_key">Tab</string>
     <string name="label_delete_key" tools:keep="@string/label_delete_key">Eliminar</string>

@@ -207,7 +207,6 @@
     <string name="show_hints">Näita klahvide vihjeid</string>
     <string name="button_load_custom">Laadi fail</string>
     <string name="subtype_mns">Mansi</string>
-    <string name="prefs_space_bar_text">Sinu tekst tühikuklahvil</string>
     <string name="clipboard_toolbar_keys">Vali lõikelaua nupud tööriistariba jaoks</string>
     <string name="subtype_generic_extended">%s (laiendatud)</string>
     <string name="load">Laadi</string>
@@ -296,7 +295,6 @@
     <string name="main_colors">Näita vaid põhivärve</string>
     <string name="theme_name_chocolate" tools:keep="@string/theme_name_chocolate">Šokolaadipruun</string>
     <string name="theme_name_violette" tools:keep="@string/theme_name_violette">Punakassinine</string>
-    <string name="select_color_spacebar_text">Tühikuklahvi tekst</string>
     <string name="action_none">Määramata</string>
     <string name="show_vertical_space_swipe">Püstise tühikuklahvi viipežest</string>
     <string name="show_horizontal_space_swipe">Rõhtse tühikuklahvi viipežest</string>

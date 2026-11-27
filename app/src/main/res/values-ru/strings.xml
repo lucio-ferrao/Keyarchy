@@ -158,7 +158,6 @@
     <string name="select_color_key_background">Фон клавиш</string>
     <string name="select_color_functional_key_background">Фон функциональных клавиш</string>
     <string name="select_color_spacebar_background">Фон пробела</string>
-    <string name="select_color_spacebar_text">Текст на клавише пробела</string>
     <string name="select_color_accent">Акцент</string>
     <string name="settings_screen_about">О приложении</string>
     <string name="version">Версия</string>
@@ -327,7 +326,6 @@
     <string name="layout_number_row" tools:keep="@string/layout_number_row">Ряд с цифрами</string>
     <string name="gesture_floating_preview_static_summary">Показывать предложенное слово во время набора жестами</string>
     <string name="gesture_trail_fadeout_duration">Время жизни следа жеста</string>
-    <string name="prefs_space_bar_text">Пользовательский текст на клавише пробела</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Строка буфера обмена внизу</string>
     <string name="gesture_floating_preview_static">Плавающий предпросмотр</string>
     <string name="gesture_floating_preview_dynamic_summary">Перемещаемый предпросмотр при наборе жестами</string>

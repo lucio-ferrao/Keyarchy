@@ -233,7 +233,6 @@
     <string name="add_dictionary">Scegli un dizionario da aggiungere. I dizionari in formato .dict possono essere scaricati %s.</string>
     <string name="dictionary_load_error">Errore nel caricamento del dizionario</string>
     <string name="theme_name_blue_gray" tools:keep="@string/theme_name_blue_gray">Livido</string>
-    <string name="select_color_spacebar_text">Testo della barra spaziatrice</string>
     <string name="theme_name_light" tools:keep="@string/theme_name_light">Chiaro</string>
     <string name="user_dict_add_word_button">Aggiungi una parola</string>
     <string name="select_color_suggestion">Testo dei suggerimenti</string>
@@ -336,7 +335,6 @@
     <string name="gesture_floating_preview_static">Anteprima mobile dinamica</string>
     <string name="gesture_floating_preview_dynamic_summary">Sposta l\'anteprima seguendo il gesto</string>
     <string name="layout_number_row" tools:keep="@string/layout_number_row">Riga dei numeri</string>
-    <string name="prefs_space_bar_text">Testo personalizzato sulla barra spaziatrice</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Cronologia appunti (ultima riga in basso)</string>
     <string name="label_stop_onehanded_mode_key" tools:keep="@string/label_stop_onehanded_mode_key">Esci dalla modalità a una mano</string>
     <string name="label_enter_key" tools:keep="@string/label_enter_key">Invio</string>

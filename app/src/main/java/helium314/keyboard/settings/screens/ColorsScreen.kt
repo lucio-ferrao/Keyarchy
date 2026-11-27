@@ -260,14 +260,13 @@ val colorPrefsAndResIds = listOf(
     KeyboardTheme.COLOR_TEXT to R.string.select_color_key,
     KeyboardTheme.COLOR_HINT_TEXT to R.string.select_color_key_hint,
     KeyboardTheme.COLOR_SUGGESTION_TEXT to R.string.select_color_suggestion,
-    KeyboardTheme.COLOR_SPACEBAR_TEXT to R.string.select_color_spacebar_text,
     KeyboardTheme.COLOR_ACCENT to R.string.select_color_accent,
     KeyboardTheme.COLOR_GESTURE to R.string.select_color_gesture,
 )
 
 private fun getColorPrefsToHideInitially(prefs: SharedPreferences): List<String> {
-    return listOf(KeyboardTheme.COLOR_SUGGESTION_TEXT, KeyboardTheme.COLOR_SPACEBAR_TEXT, KeyboardTheme.COLOR_GESTURE) +
-            if (prefs.getBoolean(Settings.PREF_THEME_KEY_BORDERS, false)) listOf(KeyboardTheme.COLOR_SPACEBAR_TEXT)
+    return listOf(KeyboardTheme.COLOR_SUGGESTION_TEXT, KeyboardTheme.COLOR_GESTURE) +
+            if (prefs.getBoolean(Settings.PREF_THEME_KEY_BORDERS, false)) emptyList()
             else listOf(KeyboardTheme.COLOR_FUNCTIONAL_KEYS)
 }
 

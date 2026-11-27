@@ -270,7 +270,6 @@
     <string name="select_color_suggestion">Texto da faixa de sugestão</string>
     <string name="select_color_key_background">Fundo da tecla</string>
     <string name="select_color_functional_key_background">Fundo da tecla funcional</string>
-    <string name="select_color_spacebar_text">Texto da barra de espaço</string>
     <string name="select_color_gesture">Entrada de gesto</string>
     <string name="settings_screen_about">Sobre</string>
     <string name="about_github_link">Veja no GitHub</string>
@@ -337,7 +336,6 @@
     <string name="gesture_trail_fadeout_duration">Tempo de vida do percurso do gesto</string>
     <string name="icon_style">Estilo do ícone</string>
     <string name="layout_number_row" tools:keep="@string/layout_number_row">Linha de números</string>
-    <string name="prefs_space_bar_text">Texto customizado na barra de espaço</string>
     <string name="layout_clip_bottom_row" tools:keep="@string/layout_clip_bottom_row">Linha inferior da área de transferência</string>
     <string name="label_enter_key" tools:keep="@string/label_enter_key">Enter</string>
     <string name="label_tab_key" tools:keep="@string/label_tab_key">Tab</string>
